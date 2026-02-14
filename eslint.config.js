@@ -2,4 +2,7 @@
 
 import { tanstackConfig } from '@tanstack/eslint-config'
 
-export default [...tanstackConfig]
+export default [
+  { ignores: ['.output/**', '.worktrees/**', '.nitro/**', '*.config.js', '*.config.mjs'] },
+  ...tanstackConfig,
+]

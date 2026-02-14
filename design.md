@@ -87,6 +87,7 @@ FreightOS App
 **Accent**: Electric Blue `#2D7FF9` — used for interactive elements, selected states, AI agent indicators, and primary CTA buttons. Visually distinct on dark and light backgrounds.
 
 **Status Colors**:
+
 - Active / En Route: `#2D7FF9` (blue)
 - Success / Delivered: `#00B67A` (green)
 - Warning / At Risk: `#F5A623` (amber)
@@ -95,6 +96,7 @@ FreightOS App
 - AI Suggestion: `#7C5CFC` (purple) — all AI-generated content gets this treatment to be immediately distinguishable
 
 **Surfaces**:
+
 - Background: `#F5F7FA` (cool gray)
 - Card: `#FFFFFF` (white)
 - Elevated Card: white with `0 2px 8px rgba(0,0,0,0.08)` shadow
@@ -135,15 +137,18 @@ Transitions: 200ms ease-out for screen changes, 150ms for micro-interactions. Bo
 **Layout**: Single scrollable column.
 
 **Section 1 — Greeting & Status Bar** (top, sticky below status bar)
+
 - "Good morning, [Name]" with current date
 - Two pill-shaped status chips: "12 trucks rolling" / "3 exceptions"
 - Notification bell icon (right) with unread badge
 
 **Section 2 — Quick Actions Strip** (horizontal scroll)
+
 - Pill-shaped buttons: "New Load" / "Dispatch AI" / "Voice Agent" / "Find Truck"
 - Each opens the relevant flow directly
 
 **Section 3 — Operations Summary** (2×2 card grid)
+
 - Card 1: Active Loads (count, split by carrier/brokered)
 - Card 2: Available Trucks (count, with mini bar chart by region)
 - Card 3: Today's Revenue (running total, % of daily target)
@@ -151,11 +156,13 @@ Transitions: 200ms ease-out for screen changes, 150ms for micro-interactions. Bo
 - Each card is tappable, navigating to the relevant detail view
 
 **Section 4 — Mini Map** (full width, 200px height)
+
 - Shows all active trucks as dots with status colors
 - Tap to expand to full-screen fleet map
 - Cluster pins in dense areas with count badges
 
 **Section 5 — Exception Feed** (scrollable cards)
+
 - Chronological list of active exceptions requiring attention
 - Each card shows: severity icon, load number, description, time since detection, suggested action
 - AI-generated suggestions are marked with purple accent and sparkle icon
@@ -170,6 +177,7 @@ Transitions: 200ms ease-out for screen changes, 150ms for micro-interactions. Bo
   ```
 
 **Section 6 — Today's Schedule** (timeline)
+
 - Vertical timeline showing upcoming events for the next 12 hours
 - Pickups, deliveries, driver shift changes, appointments
 - Tap any event to navigate to the relevant load or driver
@@ -179,17 +187,20 @@ Transitions: 200ms ease-out for screen changes, 150ms for micro-interactions. Bo
 ### 3.2 Load List Screen
 
 **Header**: "Loads" with segment control: Active / Available / Completed
+
 - Active: loads currently assigned and in progress
 - Available: unmatched loads needing dispatch (broker view)
 - Completed: last 7 days of delivered loads
 
 **Filter Bar** (horizontal scroll, below header):
+
 - Pill filters: Status, Origin, Destination, Equipment, Customer, Date Range
 - Active filters show with X to remove
 - Filter count badge on the filter icon
 
 **Load Cards** (scrollable list):
 Each card is a horizontal layout optimized for scanning:
+
 ```
 ┌──────────────────────────────────────────┐
 │  #4521        DRY VAN        $2,850      │
@@ -216,10 +227,12 @@ Each card is a horizontal layout optimized for scanning:
 **Layout**: Full-screen view with sticky header and scrollable content sections.
 
 **Sticky Header**:
+
 - Back arrow, load number, status badge
 - Three action buttons: Call, Navigate, More (...)
 
 **Section 1 — Route**
+
 - Mini map showing origin → destination with current truck position
 - Origin block: facility name, address, appointment window, actual arrival/departure
 - Destination block: same format
@@ -227,30 +240,35 @@ Each card is a horizontal layout optimized for scanning:
 - Distance and estimated drive time between points
 
 **Section 2 — Assignment**
+
 - Driver card: photo placeholder, name, phone (tap to call), HOS remaining
 - Truck card: unit number, equipment type, current mileage
 - Trailer card: trailer number, status
 - "Reassign" button if load is pre-dispatch
 
 **Section 3 — Lifecycle Tracker**
+
 - Horizontal stepper with all lifecycle stages
 - Current stage highlighted and pulsing
 - Tap any stage to see timestamp and details
 - Completed stages show green checkmarks with timestamps
 
 **Section 4 — Financials**
+
 - Rate breakdown: line haul, fuel surcharge, accessorials
 - Total revenue, carrier cost (if brokered), margin amount and %
 - Rate per mile calculation
 - Editable fields for adding accessorials (detention, lumper)
 
 **Section 5 — Documents**
+
 - Grid of document thumbnails: BOL, POD, rate confirmation, scale ticket
 - Tap to view full-screen with zoom
 - "Add Document" button → camera capture or file upload simulation
 - Missing document indicators with red badges
 
 **Section 6 — Communication Log**
+
 - Chronological feed of all communications related to this load
 - Includes: dispatcher notes, driver check-ins, voice agent transcripts, system events, customer notifications
 - Each entry shows: timestamp, source (human/AI), content
@@ -265,12 +283,14 @@ Each card is a horizontal layout optimized for scanning:
 
 **List View**:
 Two-panel layout (top/bottom split on mobile):
+
 - Top panel: Unassigned loads (scrollable horizontal cards)
 - Bottom panel: Available trucks (scrollable list)
 - Tap a load, then tap a truck to see AI compatibility analysis
 - Confirm button to dispatch
 
 **Timeline View** (primary):
+
 - Horizontal scrolling timeline (24-hour segments, swipeable)
 - Each row is a truck, showing scheduled loads as colored blocks
 - Empty gaps are highlighted as available windows
@@ -279,6 +299,7 @@ Two-panel layout (top/bottom split on mobile):
 - Color-coded by status: assigned (blue), in transit (green), at facility (amber)
 
 **AI Recommendation Panel** (bottom sheet, auto-appears):
+
 - Heading: "✨ Dispatch Suggestions"
 - List of recommended assignments with reasoning:
   ```
@@ -299,6 +320,7 @@ Two-panel layout (top/bottom split on mobile):
 **Layout**: Full-screen map with overlay controls.
 
 **Map Elements**:
+
 - Truck pins with directional indicators (pointing in direction of travel)
 - Pin color matches truck status
 - Tap pin → popup card with: truck number, driver, current load, ETA
@@ -308,10 +330,12 @@ Two-panel layout (top/bottom split on mobile):
 - Traffic overlay toggle
 
 **Overlay Controls** (top):
+
 - Search bar (find truck, driver, or load on map)
 - Filter chips: Show All, En Route, Empty, At Facility, Out of Service
 
 **Bottom Panel** (peek-up sheet):
+
 - Shows list of visible trucks with key stats
 - Drag up to see full list, drag down to minimize
 - Tap any truck in list to center map on it
@@ -323,11 +347,13 @@ Two-panel layout (top/bottom split on mobile):
 **Layout**: Full-screen chat with input area at bottom.
 
 **Chat Header**:
+
 - "Dispatch AI" title with sparkle icon
 - Status indicator: "Active" with green dot
 - Context chip: "Viewing all operations" (or specific load/truck context if entered from detail screen)
 
 **Chat Area**:
+
 - Message bubbles, left-aligned for AI, right-aligned for user
 - AI messages use a subtle purple-tinted background
 - Rich content in AI messages:
@@ -338,12 +364,14 @@ Two-panel layout (top/bottom split on mobile):
 - Typing indicator with three pulsing dots when AI is "thinking"
 
 **Input Area**:
+
 - Text field with microphone button for voice input
 - Send button (arrow icon)
 - Quick suggestion chips above input: context-aware prompts like "Show empty trucks", "Tomorrow's plan", "Unmatched loads"
 - When voice input is active: waveform animation, transcript appears in real-time
 
 **Example Conversation Flow** (for demo):
+
 ```
 User: "What's the situation for tomorrow?"
 
@@ -379,6 +407,7 @@ AI: "Truck T-208 (Driver: James Wright) is scheduled
 **Sub-tabs**: Live Calls / History / Performance / Settings
 
 **Live Calls View**:
+
 - Card per active call:
   ```
   ┌──────────────────────────────────────────┐
@@ -400,12 +429,14 @@ AI: "Truck T-208 (Driver: James Wright) is scheduled
 - If no live calls, show placeholder with today's stats
 
 **Call History View**:
+
 - Scrollable list of completed calls
 - Each entry: caller name/number, direction (in/out), duration, outcome classification (resolved, transferred, failed), timestamp
 - Tap to expand → full transcript with AI summary
 - Filter by: direction, outcome, caller, date
 
 **Call Detail (expanded)**:
+
 - Full scrollable transcript with speaker labels
 - AI-generated call summary at top (2-3 sentences)
 - Outcome: what was resolved, what actions were taken
@@ -414,6 +445,7 @@ AI: "Truck T-208 (Driver: James Wright) is scheduled
 - Quality indicators: clarity score, sentiment arc, confidence throughout call
 
 **Performance View**:
+
 - Top metrics: calls handled today, avg duration, resolution rate, calls transferred
 - Chart: calls by hour (bar chart)
 - Chart: resolution rate trend (line chart, 7-day)
@@ -421,6 +453,7 @@ AI: "Truck T-208 (Driver: James Wright) is scheduled
 - Comparison: AI-handled vs human-handled (volume and satisfaction)
 
 **Settings View** (Voice Agent Configuration):
+
 - Agent name and persona: text field, dropdown for voice style (professional, friendly, regional)
 - Business rules panel:
   - Rate quotation authority: toggle on/off, if on: max margin floor, max discount %
@@ -439,11 +472,13 @@ AI: "Truck T-208 (Driver: James Wright) is scheduled
 **Visual Design**: Dark background mimicking a phone call screen.
 
 **Top Section**:
+
 - Caller info: name, company, phone number
 - Call direction indicator (inbound/outbound)
 - Duration counter
 
 **Middle Section — Dual Transcript**:
+
 - Split view showing both sides of the conversation
 - Left: Caller's words (white text)
 - Right: AI Agent's words (purple-accented text)
@@ -451,17 +486,20 @@ AI: "Truck T-208 (Driver: James Wright) is scheduled
 - Highlighted keywords that the AI is reacting to (e.g., load number, location, rate)
 
 **Bottom Section — System Actions**:
+
 - Real-time feed of actions the AI is taking during the call
 - e.g., "Searching for Load #4521...", "Found: ATL→MEM, ETA 4:30 PM", "Updating caller with status"
 - Shows the AI's "thinking" process alongside the conversation
 
 **Controls**:
+
 - Play/Pause button (controls demo playback)
 - Speed control: 1x, 1.5x, 2x
 - Skip to next key moment (for faster demo)
 - "End Call" button → shows call summary
 
 **Post-Call Summary Screen**:
+
 - AI-generated summary of the call
 - Actions taken (with links to affected loads/records)
 - Sentiment analysis
@@ -469,6 +507,7 @@ AI: "Truck T-208 (Driver: James Wright) is scheduled
 - "Replay" and "Try Another Scenario" buttons
 
 **Demo Scenarios Available**:
+
 1. Shipper calls asking "Where's my truck?" — AI resolves with live tracking
 2. Shipper calls to tender a new load — AI captures details and creates load
 3. AI calls partner carrier to offer a load — handles negotiation
@@ -482,17 +521,20 @@ AI: "Truck T-208 (Driver: James Wright) is scheduled
 **Layout**: Map + list hybrid.
 
 **Top Half — Lane Map**:
+
 - Map showing available loads as origin markers with lines to destinations
 - Color-coded by margin potential (green/yellow/red)
 - Cluster view when zoomed out
 - Tap a lane to see load details and available capacity
 
 **Bottom Half — Load List** (drag-up to full screen):
+
 - Each card shows: origin-destination, rate, margin %, equipment, pickup date, age (time since posted)
 - Sort options: margin, distance, pickup date, customer priority
 - "Match" button on each card → opens carrier matching bottom sheet
 
 **Carrier Matching Bottom Sheet**:
+
 - AI-ranked list of available carriers/trucks for the selected load
 - Each option shows: carrier name, truck/driver, deadhead miles, rate expectation, scorecard summary, match score
 - "Offer Load" button → triggers voice agent outbound call or sends digital offer
@@ -507,6 +549,7 @@ AI: "Truck T-208 (Driver: James Wright) is scheduled
 **Header**: Date range selector (today, this week, this month, custom)
 
 **KPI Strip** (horizontal scroll):
+
 - On-time pickup %
 - On-time delivery %
 - Revenue per truck per week
@@ -548,6 +591,7 @@ Split metrics: dispatches assisted by AI, voice calls handled, exceptions auto-r
 **Layout**: Utility screen, not designed for end-user aesthetics.
 
 **Scenario Selector**:
+
 - List of pre-built scenarios with descriptions
 - "Load Scenario" button replaces current demo state with scenario data
 - Scenarios:
@@ -559,12 +603,14 @@ Split metrics: dispatches assisted by AI, voice calls handled, exceptions auto-r
   6. End of Day — wrapping up operations, reviewing tomorrow
 
 **Time Simulator**:
+
 - Clock display showing current simulated time
 - Fast-forward button: advance 15 min, 1 hr, 4 hr increments
 - Events queue: shows what will trigger at each time advance
 - Current state indicator
 
 **Event Injector**:
+
 - Button grid for triggering events on demand:
   - "Truck Breakdown" → select which truck
   - "Shipper Cancellation" → select which load
@@ -577,10 +623,12 @@ Split metrics: dispatches assisted by AI, voice calls handled, exceptions auto-r
 - Each injection shows a confirmation and then navigates to the relevant screen to see the impact
 
 **Reset**:
+
 - "Reset to Default" button with confirmation dialog
 - "Reset Current Scenario" to restart the active scenario from its beginning state
 
 **Guided Tour**:
+
 - "Start Tour" button launches an overlay walkthrough
 - Sequential tooltips highlighting key features with descriptions
 - Progress indicator (step X of Y)
@@ -593,6 +641,7 @@ Split metrics: dispatches assisted by AI, voice calls handled, exceptions auto-r
 All AI-generated content follows a consistent visual pattern so users always know when they're seeing AI output vs human/system data.
 
 ### 4.1 AI Content Indicators
+
 - Purple accent color `#7C5CFC` for borders, icons, and highlights
 - Sparkle icon (✨) prefix on AI-generated text and suggestions
 - "AI" badge on recommendation cards
@@ -600,12 +649,15 @@ All AI-generated content follows a consistent visual pattern so users always kno
 - Pulsing animation on AI "thinking" states
 
 ### 4.2 Confidence Visualization
+
 - High confidence (85-100%): solid purple accent, full sparkle icon, bold recommendation
 - Medium confidence (60-84%): lighter purple, half-filled sparkle, "Consider" language
 - Low confidence (below 60%): gray with purple outline, empty sparkle, "Possible" language, stronger nudge toward human review
 
 ### 4.3 Reasoning Transparency
+
 Every AI recommendation includes an expandable reasoning section:
+
 - Default: collapsed, showing only the recommendation and score
 - Expanded: bullet-point list of factors with individual scores/values
 - "Why not X?" link: shows why the AI didn't recommend alternatives the user might expect
@@ -616,12 +668,14 @@ Every AI recommendation includes an expandable reasoning section:
 ## 5. Component Library
 
 ### 5.1 Status Badge
+
 - Rounded pill shape, 24px height
 - Background: status color at 15% opacity
 - Text: status color at 100%, 12px semibold
 - Variants: En Route, Loading, Empty, Delivered, Exception, Cancelled, Pending
 
 ### 5.2 Metric Card
+
 - White card, 8px border radius
 - Value: 28px bold, contextual color
 - Label: 12px gray, below value
@@ -629,6 +683,7 @@ Every AI recommendation includes an expandable reasoning section:
 - Tap target: entire card
 
 ### 5.3 Entity Card (Load, Truck, Driver)
+
 - White card, 12px border radius, 16px padding
 - Left accent stripe (4px) in status color
 - Title row: entity ID + status badge
@@ -637,6 +692,7 @@ Every AI recommendation includes an expandable reasoning section:
 - AI suggestion row (optional): purple background strip at bottom
 
 ### 5.4 Timeline Step
+
 - Vertical line with circular nodes
 - Active node: filled circle with pulse animation
 - Completed node: green circle with check
@@ -644,6 +700,7 @@ Every AI recommendation includes an expandable reasoning section:
 - Between nodes: timestamp and description text
 
 ### 5.5 Chat Bubble
+
 - User: right-aligned, blue background, white text, rounded corners (top-left sharp)
 - AI: left-aligned, purple-tinted white background, dark text, rounded corners (top-right sharp)
 - System: centered, gray background, small text
@@ -651,6 +708,7 @@ Every AI recommendation includes an expandable reasoning section:
 - Rich content: tables, mini maps, and action buttons render inline within bubbles
 
 ### 5.6 Bottom Sheet
+
 - Drag handle: 40px wide, 4px tall, centered, gray
 - Peek height: content-dependent (usually 30-40% of screen)
 - Full height: 90% of screen (maintains status bar visibility)
@@ -658,6 +716,7 @@ Every AI recommendation includes an expandable reasoning section:
 - Overlay: dark scrim on content behind
 
 ### 5.7 Floating Action Button
+
 - 56px circle, accent blue, white icon
 - Bottom-right position, 16px from edges, above tab bar
 - Shadow: `0 4px 12px rgba(45,127,249,0.3)`
@@ -665,6 +724,7 @@ Every AI recommendation includes an expandable reasoning section:
 - Options fan out vertically with labels
 
 ### 5.8 Voice Call Card
+
 - Dark background (`#1A1A2E`)
 - Caller info in white, large text
 - Waveform animation during active speech (green for caller, purple for AI)
@@ -676,6 +736,7 @@ Every AI recommendation includes an expandable reasoning section:
 ## 6. Interaction Patterns
 
 ### 6.1 Dispatch Assignment Flow
+
 1. User sees unassigned load (red badge on Loads tab or exception in dashboard)
 2. Taps load → Load Detail screen
 3. AI recommendation auto-appears in a bottom sheet: "Suggested: Truck T-208, Score 94"
@@ -691,6 +752,7 @@ Alternative: User disagrees with AI suggestion
 5d. User confirms anyway → same success flow
 
 ### 6.2 Voice Agent Trigger Flow
+
 1. From any screen: tap the FAB → "Trigger Call Demo"
 2. Or from Voice Agent Dashboard → "Test Call" button
 3. Or from Demo Controls → "Incoming Call" injector
@@ -702,6 +764,7 @@ Alternative: User disagrees with AI suggestion
 9. "Return to Dashboard" → sees the changes the voice agent made (new load, updated status, etc.)
 
 ### 6.3 Exception Resolution Flow
+
 1. Exception appears in dashboard feed with red indicator
 2. User taps exception card → slides to detail view
 3. AI analysis at top: "This delay was caused by traffic on I-20. Current impact: 45 min late to delivery."
@@ -715,6 +778,7 @@ Alternative: User disagrees with AI suggestion
 8. Call completes → exception status updated → card turns amber (monitoring) or green (resolved)
 
 ### 6.4 Natural Language Dispatch
+
 1. User taps AI Agent tab → chat interface
 2. Types or speaks: "I need a reefer for a load from Jacksonville to Nashville, picking up Wednesday"
 3. AI processes and responds:
@@ -734,41 +798,49 @@ Alternative: User disagrees with AI suggestion
 The prototype is initialized with the following interconnected demo data:
 
 **Trucks (45 units)**:
+
 - 30 dry vans (T-201 through T-230)
 - 10 reefers (T-301 through T-310)
 - 5 flatbeds (T-401 through T-405)
 - Distributed across: Atlanta (hub), Memphis, Nashville, Charlotte, Jacksonville, Birmingham
 
 **Drivers (30 active)**:
+
 - Each assigned to a truck (15 trucks are spare/in maintenance)
 - HOS status varies: 8 with 8+ hours, 10 with 4-8 hours, 7 with less than 4 hours, 5 on 34-hour reset
 - Home bases distributed across the Southeast
 - Performance scores range from 72 to 98
 
 **Active Loads (80)**:
+
 - 55 carrier loads (company trucks)
 - 25 brokered loads (partner carriers)
 - Status distribution: 20 in transit, 15 at pickup, 10 at delivery, 12 pending dispatch, 8 delivered today, 15 planned for tomorrow
 - Mix of local (under 200mi), regional (200-500mi), and long-haul (500+mi)
 
 **Shippers (15 accounts)**:
+
 - Mix of manufacturing, distribution, retail, food/beverage
 - Named realistically for demo credibility
 - Each with 3-8 active loads and lane history
 
 **Partner Carriers (25)**:
+
 - Small fleets (1-10 trucks) and owner-operators
 - Scorecard data: on-time ranges from 78% to 99%
 - Equipment types and lane preferences defined
 
 ### 7.2 Geographic Network
+
 Hub: Atlanta, GA
 Primary lanes: ATL↔MEM, ATL↔NSH, ATL↔CLT, ATL↔JAX, ATL↔BHM
 Secondary lanes: MEM↔NSH, CLT↔JAX, BHM↔MEM, NSH↔CLT
 Facilities: 40 pickup/delivery locations distributed across these lanes
 
 ### 7.3 Time-Based Events
+
 The demo data includes a timeline of events that trigger when the time simulator advances:
+
 - Hour 0-2: Normal operations, 2 pickups complete, 1 delivery
 - Hour 2-4: Truck T-217 hits traffic, ETA slips → exception triggers
 - Hour 4-6: New load tenders arrive from 2 shippers
@@ -781,14 +853,17 @@ The demo data includes a timeline of events that trigger when the time simulator
 ## 8. Prototype Technology Notes
 
 ### 8.1 Implementation Approach
+
 The prototype is built as a single-page React application with simulated data. No backend is required. All data lives in client-side state, and all AI interactions are either pre-scripted (voice agent demos) or powered by a live LLM API call (dispatch chat).
 
 ### 8.2 AI Integration Points
+
 - **Dispatch Chat**: Real API calls to Claude with system prompt containing the full demo data context. Each message sends the current state of loads, trucks, and drivers so the AI can reason over live data.
 - **Recommendations**: Pre-computed on demo data load, updated when state changes (e.g., after a dispatch action). Uses a scoring algorithm that weights the matching factors defined in requirements.
 - **Voice Agent Demos**: Pre-recorded scenario scripts with timed transcript playback. No live speech synthesis needed — the demo simulates the experience visually with text transcripts and system action feeds.
 
 ### 8.3 State Management
+
 - All demo data stored in a central state store (React context or Zustand)
 - Actions (dispatch, status update, exception resolution) modify state in real-time
 - Time simulator advances the clock and triggers pre-defined events
@@ -796,6 +871,7 @@ The prototype is built as a single-page React application with simulated data. N
 - Reset restores the original seed data
 
 ### 8.4 Map Implementation
+
 - Use Mapbox GL JS or Leaflet with OpenStreetMap tiles
 - Truck positions are interpolated between waypoints based on simulated time
 - Geofences defined as circles around facility coordinates
@@ -863,6 +939,7 @@ Multi-turn  Live  Hist  Perf    Forecast
 ## 10. Responsive Behavior
 
 ### Phone (390px) — Primary Target
+
 - Single column layout throughout
 - Bottom tab navigation
 - Bottom sheets for secondary content
@@ -872,6 +949,7 @@ Multi-turn  Live  Hist  Perf    Forecast
 - Charts are single-column, swipeable
 
 ### Tablet (768px) — Secondary
+
 - Two-column layouts where appropriate (dispatch board shows loads + trucks side by side)
 - Map gets a persistent side panel instead of bottom sheet
 - Dashboard shows 3-column KPI grid
@@ -879,6 +957,7 @@ Multi-turn  Live  Hist  Perf    Forecast
 - Bottom navigation moves to side rail
 
 ### Large Screen (1024px+) — Optional
+
 - Three-column dispatch board (loads / timeline / recommendations)
 - Dashboard shows all sections simultaneously
 - Voice agent dashboard shows all sub-tabs simultaneously

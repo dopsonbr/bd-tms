@@ -9,50 +9,487 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppMoreRouteImport } from './routes/_app/more'
+import { Route as AppLoadsRouteImport } from './routes/_app/loads'
+import { Route as AppFleetRouteImport } from './routes/_app/fleet'
+import { Route as AppAiRouteImport } from './routes/_app/ai'
+import { Route as AppMoreIndexRouteImport } from './routes/_app/more/index'
+import { Route as AppLoadsIndexRouteImport } from './routes/_app/loads/index'
+import { Route as AppFleetIndexRouteImport } from './routes/_app/fleet/index'
+import { Route as AppMoreVoiceRouteImport } from './routes/_app/more/voice'
+import { Route as AppMoreShippersRouteImport } from './routes/_app/more/shippers'
+import { Route as AppMoreReportsRouteImport } from './routes/_app/more/reports'
+import { Route as AppMoreNotificationsRouteImport } from './routes/_app/more/notifications'
+import { Route as AppMoreDriversRouteImport } from './routes/_app/more/drivers'
+import { Route as AppMoreDispatchRouteImport } from './routes/_app/more/dispatch'
+import { Route as AppMoreCarriersRouteImport } from './routes/_app/more/carriers'
+import { Route as AppLoadsLoadIdRouteImport } from './routes/_app/loads/$loadId'
+import { Route as AppFleetTruckIdRouteImport } from './routes/_app/fleet/$truckId'
+import { Route as AppMoreDriversIndexRouteImport } from './routes/_app/more/drivers/index'
+import { Route as AppMoreDriversDriverIdRouteImport } from './routes/_app/more/drivers/$driverId'
 
-const IndexRoute = IndexRouteImport.update({
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMoreRoute = AppMoreRouteImport.update({
+  id: '/more',
+  path: '/more',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLoadsRoute = AppLoadsRouteImport.update({
+  id: '/loads',
+  path: '/loads',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFleetRoute = AppFleetRouteImport.update({
+  id: '/fleet',
+  path: '/fleet',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAiRoute = AppAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMoreIndexRoute = AppMoreIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppMoreRoute,
+} as any)
+const AppLoadsIndexRoute = AppLoadsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppLoadsRoute,
+} as any)
+const AppFleetIndexRoute = AppFleetIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppFleetRoute,
+} as any)
+const AppMoreVoiceRoute = AppMoreVoiceRouteImport.update({
+  id: '/voice',
+  path: '/voice',
+  getParentRoute: () => AppMoreRoute,
+} as any)
+const AppMoreShippersRoute = AppMoreShippersRouteImport.update({
+  id: '/shippers',
+  path: '/shippers',
+  getParentRoute: () => AppMoreRoute,
+} as any)
+const AppMoreReportsRoute = AppMoreReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AppMoreRoute,
+} as any)
+const AppMoreNotificationsRoute = AppMoreNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AppMoreRoute,
+} as any)
+const AppMoreDriversRoute = AppMoreDriversRouteImport.update({
+  id: '/drivers',
+  path: '/drivers',
+  getParentRoute: () => AppMoreRoute,
+} as any)
+const AppMoreDispatchRoute = AppMoreDispatchRouteImport.update({
+  id: '/dispatch',
+  path: '/dispatch',
+  getParentRoute: () => AppMoreRoute,
+} as any)
+const AppMoreCarriersRoute = AppMoreCarriersRouteImport.update({
+  id: '/carriers',
+  path: '/carriers',
+  getParentRoute: () => AppMoreRoute,
+} as any)
+const AppLoadsLoadIdRoute = AppLoadsLoadIdRouteImport.update({
+  id: '/$loadId',
+  path: '/$loadId',
+  getParentRoute: () => AppLoadsRoute,
+} as any)
+const AppFleetTruckIdRoute = AppFleetTruckIdRouteImport.update({
+  id: '/$truckId',
+  path: '/$truckId',
+  getParentRoute: () => AppFleetRoute,
+} as any)
+const AppMoreDriversIndexRoute = AppMoreDriversIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppMoreDriversRoute,
+} as any)
+const AppMoreDriversDriverIdRoute = AppMoreDriversDriverIdRouteImport.update({
+  id: '/$driverId',
+  path: '/$driverId',
+  getParentRoute: () => AppMoreDriversRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
+  '/ai': typeof AppAiRoute
+  '/fleet': typeof AppFleetRouteWithChildren
+  '/loads': typeof AppLoadsRouteWithChildren
+  '/more': typeof AppMoreRouteWithChildren
+  '/fleet/$truckId': typeof AppFleetTruckIdRoute
+  '/loads/$loadId': typeof AppLoadsLoadIdRoute
+  '/more/carriers': typeof AppMoreCarriersRoute
+  '/more/dispatch': typeof AppMoreDispatchRoute
+  '/more/drivers': typeof AppMoreDriversRouteWithChildren
+  '/more/notifications': typeof AppMoreNotificationsRoute
+  '/more/reports': typeof AppMoreReportsRoute
+  '/more/shippers': typeof AppMoreShippersRoute
+  '/more/voice': typeof AppMoreVoiceRoute
+  '/fleet/': typeof AppFleetIndexRoute
+  '/loads/': typeof AppLoadsIndexRoute
+  '/more/': typeof AppMoreIndexRoute
+  '/more/drivers/$driverId': typeof AppMoreDriversDriverIdRoute
+  '/more/drivers/': typeof AppMoreDriversIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/ai': typeof AppAiRoute
+  '/': typeof AppIndexRoute
+  '/fleet/$truckId': typeof AppFleetTruckIdRoute
+  '/loads/$loadId': typeof AppLoadsLoadIdRoute
+  '/more/carriers': typeof AppMoreCarriersRoute
+  '/more/dispatch': typeof AppMoreDispatchRoute
+  '/more/notifications': typeof AppMoreNotificationsRoute
+  '/more/reports': typeof AppMoreReportsRoute
+  '/more/shippers': typeof AppMoreShippersRoute
+  '/more/voice': typeof AppMoreVoiceRoute
+  '/fleet': typeof AppFleetIndexRoute
+  '/loads': typeof AppLoadsIndexRoute
+  '/more': typeof AppMoreIndexRoute
+  '/more/drivers/$driverId': typeof AppMoreDriversDriverIdRoute
+  '/more/drivers': typeof AppMoreDriversIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/_app/ai': typeof AppAiRoute
+  '/_app/fleet': typeof AppFleetRouteWithChildren
+  '/_app/loads': typeof AppLoadsRouteWithChildren
+  '/_app/more': typeof AppMoreRouteWithChildren
+  '/_app/': typeof AppIndexRoute
+  '/_app/fleet/$truckId': typeof AppFleetTruckIdRoute
+  '/_app/loads/$loadId': typeof AppLoadsLoadIdRoute
+  '/_app/more/carriers': typeof AppMoreCarriersRoute
+  '/_app/more/dispatch': typeof AppMoreDispatchRoute
+  '/_app/more/drivers': typeof AppMoreDriversRouteWithChildren
+  '/_app/more/notifications': typeof AppMoreNotificationsRoute
+  '/_app/more/reports': typeof AppMoreReportsRoute
+  '/_app/more/shippers': typeof AppMoreShippersRoute
+  '/_app/more/voice': typeof AppMoreVoiceRoute
+  '/_app/fleet/': typeof AppFleetIndexRoute
+  '/_app/loads/': typeof AppLoadsIndexRoute
+  '/_app/more/': typeof AppMoreIndexRoute
+  '/_app/more/drivers/$driverId': typeof AppMoreDriversDriverIdRoute
+  '/_app/more/drivers/': typeof AppMoreDriversIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/ai'
+    | '/fleet'
+    | '/loads'
+    | '/more'
+    | '/fleet/$truckId'
+    | '/loads/$loadId'
+    | '/more/carriers'
+    | '/more/dispatch'
+    | '/more/drivers'
+    | '/more/notifications'
+    | '/more/reports'
+    | '/more/shippers'
+    | '/more/voice'
+    | '/fleet/'
+    | '/loads/'
+    | '/more/'
+    | '/more/drivers/$driverId'
+    | '/more/drivers/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/ai'
+    | '/'
+    | '/fleet/$truckId'
+    | '/loads/$loadId'
+    | '/more/carriers'
+    | '/more/dispatch'
+    | '/more/notifications'
+    | '/more/reports'
+    | '/more/shippers'
+    | '/more/voice'
+    | '/fleet'
+    | '/loads'
+    | '/more'
+    | '/more/drivers/$driverId'
+    | '/more/drivers'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/_app/ai'
+    | '/_app/fleet'
+    | '/_app/loads'
+    | '/_app/more'
+    | '/_app/'
+    | '/_app/fleet/$truckId'
+    | '/_app/loads/$loadId'
+    | '/_app/more/carriers'
+    | '/_app/more/dispatch'
+    | '/_app/more/drivers'
+    | '/_app/more/notifications'
+    | '/_app/more/reports'
+    | '/_app/more/shippers'
+    | '/_app/more/voice'
+    | '/_app/fleet/'
+    | '/_app/loads/'
+    | '/_app/more/'
+    | '/_app/more/drivers/$driverId'
+    | '/_app/more/drivers/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/more': {
+      id: '/_app/more'
+      path: '/more'
+      fullPath: '/more'
+      preLoaderRoute: typeof AppMoreRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/loads': {
+      id: '/_app/loads'
+      path: '/loads'
+      fullPath: '/loads'
+      preLoaderRoute: typeof AppLoadsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/fleet': {
+      id: '/_app/fleet'
+      path: '/fleet'
+      fullPath: '/fleet'
+      preLoaderRoute: typeof AppFleetRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/ai': {
+      id: '/_app/ai'
+      path: '/ai'
+      fullPath: '/ai'
+      preLoaderRoute: typeof AppAiRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/more/': {
+      id: '/_app/more/'
+      path: '/'
+      fullPath: '/more/'
+      preLoaderRoute: typeof AppMoreIndexRouteImport
+      parentRoute: typeof AppMoreRoute
+    }
+    '/_app/loads/': {
+      id: '/_app/loads/'
+      path: '/'
+      fullPath: '/loads/'
+      preLoaderRoute: typeof AppLoadsIndexRouteImport
+      parentRoute: typeof AppLoadsRoute
+    }
+    '/_app/fleet/': {
+      id: '/_app/fleet/'
+      path: '/'
+      fullPath: '/fleet/'
+      preLoaderRoute: typeof AppFleetIndexRouteImport
+      parentRoute: typeof AppFleetRoute
+    }
+    '/_app/more/voice': {
+      id: '/_app/more/voice'
+      path: '/voice'
+      fullPath: '/more/voice'
+      preLoaderRoute: typeof AppMoreVoiceRouteImport
+      parentRoute: typeof AppMoreRoute
+    }
+    '/_app/more/shippers': {
+      id: '/_app/more/shippers'
+      path: '/shippers'
+      fullPath: '/more/shippers'
+      preLoaderRoute: typeof AppMoreShippersRouteImport
+      parentRoute: typeof AppMoreRoute
+    }
+    '/_app/more/reports': {
+      id: '/_app/more/reports'
+      path: '/reports'
+      fullPath: '/more/reports'
+      preLoaderRoute: typeof AppMoreReportsRouteImport
+      parentRoute: typeof AppMoreRoute
+    }
+    '/_app/more/notifications': {
+      id: '/_app/more/notifications'
+      path: '/notifications'
+      fullPath: '/more/notifications'
+      preLoaderRoute: typeof AppMoreNotificationsRouteImport
+      parentRoute: typeof AppMoreRoute
+    }
+    '/_app/more/drivers': {
+      id: '/_app/more/drivers'
+      path: '/drivers'
+      fullPath: '/more/drivers'
+      preLoaderRoute: typeof AppMoreDriversRouteImport
+      parentRoute: typeof AppMoreRoute
+    }
+    '/_app/more/dispatch': {
+      id: '/_app/more/dispatch'
+      path: '/dispatch'
+      fullPath: '/more/dispatch'
+      preLoaderRoute: typeof AppMoreDispatchRouteImport
+      parentRoute: typeof AppMoreRoute
+    }
+    '/_app/more/carriers': {
+      id: '/_app/more/carriers'
+      path: '/carriers'
+      fullPath: '/more/carriers'
+      preLoaderRoute: typeof AppMoreCarriersRouteImport
+      parentRoute: typeof AppMoreRoute
+    }
+    '/_app/loads/$loadId': {
+      id: '/_app/loads/$loadId'
+      path: '/$loadId'
+      fullPath: '/loads/$loadId'
+      preLoaderRoute: typeof AppLoadsLoadIdRouteImport
+      parentRoute: typeof AppLoadsRoute
+    }
+    '/_app/fleet/$truckId': {
+      id: '/_app/fleet/$truckId'
+      path: '/$truckId'
+      fullPath: '/fleet/$truckId'
+      preLoaderRoute: typeof AppFleetTruckIdRouteImport
+      parentRoute: typeof AppFleetRoute
+    }
+    '/_app/more/drivers/': {
+      id: '/_app/more/drivers/'
+      path: '/'
+      fullPath: '/more/drivers/'
+      preLoaderRoute: typeof AppMoreDriversIndexRouteImport
+      parentRoute: typeof AppMoreDriversRoute
+    }
+    '/_app/more/drivers/$driverId': {
+      id: '/_app/more/drivers/$driverId'
+      path: '/$driverId'
+      fullPath: '/more/drivers/$driverId'
+      preLoaderRoute: typeof AppMoreDriversDriverIdRouteImport
+      parentRoute: typeof AppMoreDriversRoute
     }
   }
 }
 
+interface AppFleetRouteChildren {
+  AppFleetTruckIdRoute: typeof AppFleetTruckIdRoute
+  AppFleetIndexRoute: typeof AppFleetIndexRoute
+}
+
+const AppFleetRouteChildren: AppFleetRouteChildren = {
+  AppFleetTruckIdRoute: AppFleetTruckIdRoute,
+  AppFleetIndexRoute: AppFleetIndexRoute,
+}
+
+const AppFleetRouteWithChildren = AppFleetRoute._addFileChildren(
+  AppFleetRouteChildren,
+)
+
+interface AppLoadsRouteChildren {
+  AppLoadsLoadIdRoute: typeof AppLoadsLoadIdRoute
+  AppLoadsIndexRoute: typeof AppLoadsIndexRoute
+}
+
+const AppLoadsRouteChildren: AppLoadsRouteChildren = {
+  AppLoadsLoadIdRoute: AppLoadsLoadIdRoute,
+  AppLoadsIndexRoute: AppLoadsIndexRoute,
+}
+
+const AppLoadsRouteWithChildren = AppLoadsRoute._addFileChildren(
+  AppLoadsRouteChildren,
+)
+
+interface AppMoreDriversRouteChildren {
+  AppMoreDriversDriverIdRoute: typeof AppMoreDriversDriverIdRoute
+  AppMoreDriversIndexRoute: typeof AppMoreDriversIndexRoute
+}
+
+const AppMoreDriversRouteChildren: AppMoreDriversRouteChildren = {
+  AppMoreDriversDriverIdRoute: AppMoreDriversDriverIdRoute,
+  AppMoreDriversIndexRoute: AppMoreDriversIndexRoute,
+}
+
+const AppMoreDriversRouteWithChildren = AppMoreDriversRoute._addFileChildren(
+  AppMoreDriversRouteChildren,
+)
+
+interface AppMoreRouteChildren {
+  AppMoreCarriersRoute: typeof AppMoreCarriersRoute
+  AppMoreDispatchRoute: typeof AppMoreDispatchRoute
+  AppMoreDriversRoute: typeof AppMoreDriversRouteWithChildren
+  AppMoreNotificationsRoute: typeof AppMoreNotificationsRoute
+  AppMoreReportsRoute: typeof AppMoreReportsRoute
+  AppMoreShippersRoute: typeof AppMoreShippersRoute
+  AppMoreVoiceRoute: typeof AppMoreVoiceRoute
+  AppMoreIndexRoute: typeof AppMoreIndexRoute
+}
+
+const AppMoreRouteChildren: AppMoreRouteChildren = {
+  AppMoreCarriersRoute: AppMoreCarriersRoute,
+  AppMoreDispatchRoute: AppMoreDispatchRoute,
+  AppMoreDriversRoute: AppMoreDriversRouteWithChildren,
+  AppMoreNotificationsRoute: AppMoreNotificationsRoute,
+  AppMoreReportsRoute: AppMoreReportsRoute,
+  AppMoreShippersRoute: AppMoreShippersRoute,
+  AppMoreVoiceRoute: AppMoreVoiceRoute,
+  AppMoreIndexRoute: AppMoreIndexRoute,
+}
+
+const AppMoreRouteWithChildren =
+  AppMoreRoute._addFileChildren(AppMoreRouteChildren)
+
+interface AppRouteChildren {
+  AppAiRoute: typeof AppAiRoute
+  AppFleetRoute: typeof AppFleetRouteWithChildren
+  AppLoadsRoute: typeof AppLoadsRouteWithChildren
+  AppMoreRoute: typeof AppMoreRouteWithChildren
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAiRoute: AppAiRoute,
+  AppFleetRoute: AppFleetRouteWithChildren,
+  AppLoadsRoute: AppLoadsRouteWithChildren,
+  AppMoreRoute: AppMoreRouteWithChildren,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

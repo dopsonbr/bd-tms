@@ -161,6 +161,7 @@ function LoadDetailScreen() {
 #### 1.1 `LoadDetailHeader` — `src/components/load-detail/load-detail-header.tsx`
 
 Sticky header with:
+
 - Back arrow (navigates to `/loads`)
 - Load ID (`#4521`)
 - Status badge
@@ -186,6 +187,7 @@ Props: `{ load: Load }`
 #### 1.3 `LoadAssignmentSection` — `src/components/load-detail/load-assignment-section.tsx`
 
 Card showing assigned driver, truck, and trailer info:
+
 - Driver: avatar placeholder, name, phone (tap-to-call link), HOS remaining
 - Truck: unit number, equipment type, mileage
 - Trailer: trailer ID, status
@@ -209,6 +211,7 @@ interface StepProps {
 ```
 
 Rendering:
+
 - Completed: green circle with check + green connecting line, timestamp below
 - Current: blue pulsing circle, current timestamp, bold label
 - Future: gray outlined circle, gray dashed line
@@ -220,6 +223,7 @@ Props: `{ load: Load }`
 #### 1.5 `LoadFinancialsSection` — `src/components/load-detail/load-financials-section.tsx`
 
 Table-like layout within a Card:
+
 - Line haul rate
 - Fuel surcharge
 - Each accessorial (dynamically from `load.accessorials`)
@@ -234,6 +238,7 @@ Props: `{ load: Load }`
 #### 1.6 `LoadDocumentsSection` — `src/components/load-detail/load-documents-section.tsx`
 
 Grid of document thumbnails (2×2 or 3-column). Each document:
+
 - Thumbnail image (placeholder gray rectangle with doc type icon)
 - Type label below
 - Status badge: ✓ (received/green), ⚠ (missing/red), ○ (pending/gray)
@@ -245,6 +250,7 @@ Props: `{ load: Load }`
 #### 1.7 `LoadCommunicationSection` — `src/components/load-detail/load-communication-section.tsx`
 
 Chronological feed of all `load.communications`:
+
 - Each entry: timestamp, source icon/label, content text
 - AI-generated entries: purple accent border + sparkle icon
 - System events: gray background, smaller text
@@ -269,7 +275,8 @@ export function advanceLoadStatus(loadId: EntityId) {
   if (!load) return
 
   const currentIndex = LOAD_LIFECYCLE_ORDER.indexOf(load.status)
-  if (currentIndex < 0 || currentIndex >= LOAD_LIFECYCLE_ORDER.length - 1) return
+  if (currentIndex < 0 || currentIndex >= LOAD_LIFECYCLE_ORDER.length - 1)
+    return
 
   const nextStatus = LOAD_LIFECYCLE_ORDER[currentIndex + 1]
   store.updateLoadStatus(loadId, nextStatus)
@@ -369,6 +376,7 @@ function onTouchEnd() {
 ```
 
 Reveal colored backgrounds behind the card during swipe:
+
 - Right swipe: green background with check icon
 - Left swipe: red background with X icon
 
@@ -556,6 +564,7 @@ Complex component. Structure:
   truck/time window.
 
 Implementation notes:
+
 - Use CSS grid with `grid-template-columns: 120px repeat(72, 60px)` for the timeline
 - Each load block uses `grid-column` spanning the appropriate hours
 - Horizontal scroll container wraps the grid
@@ -564,6 +573,7 @@ Implementation notes:
 #### 4.3 `DispatchListView` — `src/components/dispatch/dispatch-list-view.tsx`
 
 Two-panel layout (top/bottom):
+
 - Top panel (40% height): horizontal scroll of unassigned load mini-cards
 - Bottom panel (60% height): scrollable list of available trucks with
   AI-matched load suggestion inline
@@ -591,6 +601,7 @@ interface RecommendationCardProps {
 ```
 
 Each card:
+
 - Header: "Assign LD-4529 → T-208 (James Wright)"
 - Score badge: "94/100" with confidence color
 - Factor list: each `MatchFactor` as a tree-branch line
@@ -612,7 +623,11 @@ interface ScoreResult {
   factors: MatchFactor[]
 }
 
-export function scoreMatch(load: Load, truck: Truck, driver: Driver): ScoreResult {
+export function scoreMatch(
+  load: Load,
+  truck: Truck,
+  driver: Driver,
+): ScoreResult {
   const factors: MatchFactor[] = []
 
   // Factor 1: Deadhead distance (weight: 25%)
@@ -622,27 +637,30 @@ export function scoreMatch(load: Load, truck: Truck, driver: Driver): ScoreResul
     name: 'deadhead_miles',
     value: `${Math.round(deadhead)} mi`,
     score: deadheadScore,
-    description: deadhead < 20
-      ? 'Very close to pickup'
-      : deadhead < 50
-        ? 'Reasonable deadhead'
-        : 'Long deadhead — consider closer trucks',
+    description:
+      deadhead < 20
+        ? 'Very close to pickup'
+        : deadhead < 50
+          ? 'Reasonable deadhead'
+          : 'Long deadhead — consider closer trucks',
   })
 
   // Factor 2: HOS availability (weight: 25%)
   const driveMins = driver.hos.driveRemaining
   const loadDriveMins = (load.distance / 55) * 60 // assume 55mph avg
   const hosMargin = driveMins - loadDriveMins
-  const hosScore = hosMargin > 120 ? 100 : hosMargin > 0 ? (hosMargin / 120) * 100 : 0
+  const hosScore =
+    hosMargin > 120 ? 100 : hosMargin > 0 ? (hosMargin / 120) * 100 : 0
   factors.push({
     name: 'hos_remaining',
     value: `${(driveMins / 60).toFixed(1)} hrs`,
     score: hosScore,
-    description: hosMargin > 120
-      ? 'Plenty of drive time'
-      : hosMargin > 0
-        ? 'Tight but feasible'
-        : 'Insufficient HOS — would need relay',
+    description:
+      hosMargin > 120
+        ? 'Plenty of drive time'
+        : hosMargin > 0
+          ? 'Tight but feasible'
+          : 'Insufficient HOS — would need relay',
   })
 
   // Factor 3: Equipment compatibility (weight: 15%)
@@ -662,7 +680,10 @@ export function scoreMatch(load: Load, truck: Truck, driver: Driver): ScoreResul
   // Compare to delivery appointment end
   const etaMinutes = (deadhead / 45) * 60 + loadDriveMins // 45mph for deadhead
   const windowMinutes = 480 // simplified: assume 8hr window
-  const timeScore = etaMinutes < windowMinutes ? 100 : Math.max(0, 100 - (etaMinutes - windowMinutes) * 2)
+  const timeScore =
+    etaMinutes < windowMinutes
+      ? 100
+      : Math.max(0, 100 - (etaMinutes - windowMinutes) * 2)
   factors.push({
     name: 'delivery_window',
     value: etaMinutes < windowMinutes ? 'On time' : 'At risk',
@@ -689,13 +710,12 @@ export function scoreMatch(load: Load, truck: Truck, driver: Driver): ScoreResul
     name: 'profitability',
     value: `$${load.ratePerMile.toFixed(2)}/mi`,
     score: rateScore,
-    description: load.ratePerMile >= 2.8
-      ? 'Above average rate'
-      : 'Standard rate',
+    description:
+      load.ratePerMile >= 2.8 ? 'Above average rate' : 'Standard rate',
   })
 
   // Weighted total
-  const weights = [0.25, 0.25, 0.15, 0.15, 0.10, 0.10]
+  const weights = [0.25, 0.25, 0.15, 0.15, 0.1, 0.1]
   const totalScore = Math.round(
     factors.reduce((sum, f, i) => sum + f.score * weights[i], 0),
   )
@@ -866,17 +886,18 @@ An SVG circular gauge visualizing the driver's HOS:
 
 ```tsx
 interface HosClockProps {
-  driveRemaining: number    // minutes
-  driveMax: number          // 660 (11 hours)
+  driveRemaining: number // minutes
+  driveMax: number // 660 (11 hours)
   onDutyRemaining: number
-  onDutyMax: number         // 840 (14 hours)
+  onDutyMax: number // 840 (14 hours)
   cycleRemaining: number
-  cycleMax: number          // 4200 (70 hours)
+  cycleMax: number // 4200 (70 hours)
   nextBreakDue: number
 }
 ```
 
 Render as three concentric arcs:
+
 - Outer ring: cycle time (70h) — gray track with blue fill
 - Middle ring: on-duty time (14h) — gray track with amber fill
 - Inner ring: drive time (11h) — gray track with green fill
@@ -954,6 +975,7 @@ Empty gaps show "No assignment" with an "AI Suggest" button.
 ### Route: `src/routes/_app/fleet/equipment.tsx`
 
 Simple list view of all trailers. Each `TrailerCard` shows:
+
 - Trailer ID, type, status badge
 - Position (city)
 - Assigned truck/load if any
@@ -1076,6 +1098,7 @@ Bottom sheet that opens when user taps "Match" on a brokerage load.
 
 - **Rate slider**: for each carrier, a range slider adjusting the offered rate.
   As the user slides, the margin recalculates in real-time:
+
   ```
   margin = load.totalRevenue - (offeredRate * load.distance) - load.fuelSurcharge
   marginPercent = margin / load.totalRevenue * 100
@@ -1090,6 +1113,7 @@ Bottom sheet that opens when user taps "Match" on a brokerage load.
 ### Component: `src/components/brokerage/rate-slider.tsx`
 
 Uses a native `<input type="range">` styled with Tailwind:
+
 - Track: gray background
 - Filled portion: colored by margin (green/yellow/red gradient)
 - Thumb: accent blue circle
@@ -1102,6 +1126,7 @@ Uses a native `<input type="range">` styled with Tailwind:
 ### Route: `src/routes/_app/more/shippers.tsx`
 
 Searchable list of all 15 shippers. Each card shows:
+
 - Company name, industry badge
 - Contact name, phone
 - Active loads count
@@ -1193,16 +1218,17 @@ Searchable list of all 15 shippers. Each card shows:
 Reusable across load detail and standalone. Renders a chronological list of
 `CommunicationEntry` items with visual differentiation by source:
 
-| Source | Style |
-|--------|-------|
-| `dispatcher` | Blue-tinted bubble, right-aligned |
-| `driver` | Green-tinted bubble, left-aligned |
-| `ai_agent` | Purple-tinted bubble with sparkle, left-aligned |
-| `system` | Gray centered banner, small text |
-| `shipper` | Orange-tinted bubble, left-aligned |
-| `carrier` | Teal-tinted bubble, left-aligned |
+| Source       | Style                                           |
+| ------------ | ----------------------------------------------- |
+| `dispatcher` | Blue-tinted bubble, right-aligned               |
+| `driver`     | Green-tinted bubble, left-aligned               |
+| `ai_agent`   | Purple-tinted bubble with sparkle, left-aligned |
+| `system`     | Gray centered banner, small text                |
+| `shipper`    | Orange-tinted bubble, left-aligned              |
+| `carrier`    | Teal-tinted bubble, left-aligned                |
 
 Each entry shows:
+
 - Source icon + label
 - Timestamp (relative or absolute based on age)
 - Content text
@@ -1211,6 +1237,7 @@ Each entry shows:
 ### Component: `src/components/communication/message-input.tsx`
 
 Bottom-fixed input bar:
+
 - Text input field
 - Send button (right)
 - Attachment icon (left) — opens simulated file picker
@@ -1219,6 +1246,7 @@ Bottom-fixed input bar:
 ### Template Messages — `src/components/communication/template-picker.tsx`
 
 A sheet with pre-built message templates:
+
 - "Running approximately [X] minutes late"
 - "Confirming appointment for [date/time]"
 - "Load picked up, departing now"
@@ -1263,6 +1291,7 @@ Slide-down overlay (or Sheet from top) showing all notifications.
 ```
 
 Features:
+
 - Grouped by time (Now, Earlier, Yesterday)
 - Unread items have a blue dot indicator
 - Tap → navigates to related entity
@@ -1274,6 +1303,7 @@ Features:
 ### Component: `src/components/notifications/notification-item.tsx`
 
 Single notification row with:
+
 - Priority color dot
 - Title (bold if unread)
 - Body text (1 line, truncated)
@@ -1298,6 +1328,7 @@ interface DocumentGridProps {
 ```
 
 Each document cell:
+
 - 80×100px thumbnail area with gray background
 - Document type icon centered (FileText for BOL, FileCheck for POD, etc.)
 - Type label below
@@ -1330,6 +1361,7 @@ Full-screen overlay for viewing a document:
 ```
 
 Features:
+
 - Placeholder image (gray rectangle with document type text)
 - Pinch-to-zoom via CSS `transform: scale()` + touch handlers
 - Rotate button (90° increments)
@@ -1398,6 +1430,7 @@ the `create()` call in `src/store/index.ts`.
 ### 16.4 New Store Actions for Load Slice
 
 Add to `LoadSlice`:
+
 - `assignLoad(loadId, truckId, driverId)` — sets assignedTruckId/driverId, adds lifecycle event
 - `addLoadCommunication(loadId, entry)` — appends to communications array
 - `addLoadDocument(loadId, doc)` — appends to documents array
@@ -1405,6 +1438,7 @@ Add to `LoadSlice`:
 ### 16.5 Expand Notification Slice
 
 Add:
+
 - `addNotification(notification: Omit<Notification, 'id' | 'createdAt' | 'readAt' | 'snoozedUntil'>)` — auto-generates id and timestamps
 
 ---
@@ -1413,124 +1447,124 @@ Add:
 
 ### Phase A — Store Additions
 
-| # | File | Action |
-|---|------|--------|
-| 1 | `src/store/recommendation-slice.ts` | CREATE |
-| 2 | `src/store/voice-slice.ts` | CREATE |
-| 3 | `src/store/index.ts` | EDIT — add new slices |
-| 4 | `src/store/load-slice.ts` | EDIT — add new actions |
-| 5 | `src/store/notification-slice.ts` | EDIT — expand addNotification |
+| #   | File                                | Action                        |
+| --- | ----------------------------------- | ----------------------------- |
+| 1   | `src/store/recommendation-slice.ts` | CREATE                        |
+| 2   | `src/store/voice-slice.ts`          | CREATE                        |
+| 3   | `src/store/index.ts`                | EDIT — add new slices         |
+| 4   | `src/store/load-slice.ts`           | EDIT — add new actions        |
+| 5   | `src/store/notification-slice.ts`   | EDIT — expand addNotification |
 
 ### Phase B — Action Libraries
 
-| # | File | Depends On |
-|---|------|-----------|
-| 6 | `src/lib/load-actions.ts` | store, types |
-| 7 | `src/lib/dispatch-scoring.ts` | types, geo |
-| 8 | `src/lib/dispatch-engine.ts` | dispatch-scoring, store |
+| #   | File                          | Depends On              |
+| --- | ----------------------------- | ----------------------- |
+| 6   | `src/lib/load-actions.ts`     | store, types            |
+| 7   | `src/lib/dispatch-scoring.ts` | types, geo              |
+| 8   | `src/lib/dispatch-engine.ts`  | dispatch-scoring, store |
 
 ### Phase C — Load Detail Screen
 
-| # | File | Depends On |
-|---|------|-----------|
-| 9 | `src/components/load-detail/load-detail-header.tsx` | types, status-badge |
-| 10 | `src/components/load-detail/load-route-section.tsx` | react-leaflet, types |
-| 11 | `src/components/load-detail/load-assignment-section.tsx` | types, store |
-| 12 | `src/components/load-detail/load-lifecycle-section.tsx` | types, constants |
-| 13 | `src/components/load-detail/load-financials-section.tsx` | types, format |
-| 14 | `src/components/load-detail/load-documents-section.tsx` | types |
-| 15 | `src/components/load-detail/load-communication-section.tsx` | types, store |
-| 16 | `src/routes/_app/loads/$loadId.tsx` | all load-detail components |
+| #   | File                                                        | Depends On                 |
+| --- | ----------------------------------------------------------- | -------------------------- |
+| 9   | `src/components/load-detail/load-detail-header.tsx`         | types, status-badge        |
+| 10  | `src/components/load-detail/load-route-section.tsx`         | react-leaflet, types       |
+| 11  | `src/components/load-detail/load-assignment-section.tsx`    | types, store               |
+| 12  | `src/components/load-detail/load-lifecycle-section.tsx`     | types, constants           |
+| 13  | `src/components/load-detail/load-financials-section.tsx`    | types, format              |
+| 14  | `src/components/load-detail/load-documents-section.tsx`     | types                      |
+| 15  | `src/components/load-detail/load-communication-section.tsx` | types, store               |
+| 16  | `src/routes/_app/loads/$loadId.tsx`                         | all load-detail components |
 
 ### Phase D — Dispatch Board
 
-| # | File | Depends On |
-|---|------|-----------|
-| 17 | `src/components/dispatch/dispatch-header.tsx` | — |
-| 18 | `src/components/dispatch/timeline-view.tsx` | store, types, constants |
-| 19 | `src/components/dispatch/dispatch-list-view.tsx` | store, types |
-| 20 | `src/components/dispatch/recommendation-card.tsx` | types, ai-suggestion-banner |
-| 21 | `src/components/dispatch/ai-recommendation-panel.tsx` | recommendation-card, sheet |
-| 22 | `src/components/dispatch/dispatch-confirm-dialog.tsx` | alert-dialog, load-actions |
-| 23 | `src/routes/_app/dispatch.tsx` | all dispatch components |
+| #   | File                                                  | Depends On                  |
+| --- | ----------------------------------------------------- | --------------------------- |
+| 17  | `src/components/dispatch/dispatch-header.tsx`         | —                           |
+| 18  | `src/components/dispatch/timeline-view.tsx`           | store, types, constants     |
+| 19  | `src/components/dispatch/dispatch-list-view.tsx`      | store, types                |
+| 20  | `src/components/dispatch/recommendation-card.tsx`     | types, ai-suggestion-banner |
+| 21  | `src/components/dispatch/ai-recommendation-panel.tsx` | recommendation-card, sheet  |
+| 22  | `src/components/dispatch/dispatch-confirm-dialog.tsx` | alert-dialog, load-actions  |
+| 23  | `src/routes/_app/dispatch.tsx`                        | all dispatch components     |
 
 ### Phase E — Driver Management
 
-| # | File | Depends On |
-|---|------|-----------|
-| 24 | `src/components/drivers/driver-card.tsx` | types, status-badge, avatar |
-| 25 | `src/components/drivers/driver-roster.tsx` | driver-card, store |
-| 26 | `src/components/drivers/hos-clock.tsx` | types (SVG component) |
-| 27 | `src/components/drivers/driver-performance.tsx` | types |
-| 28 | `src/components/drivers/driver-detail-view.tsx` | hos-clock, performance, store |
-| 29 | `src/routes/_app/fleet/drivers.tsx` | driver-roster |
-| 30 | `src/routes/_app/fleet/drivers/$driverId.tsx` | driver-detail-view |
+| #   | File                                            | Depends On                    |
+| --- | ----------------------------------------------- | ----------------------------- |
+| 24  | `src/components/drivers/driver-card.tsx`        | types, status-badge, avatar   |
+| 25  | `src/components/drivers/driver-roster.tsx`      | driver-card, store            |
+| 26  | `src/components/drivers/hos-clock.tsx`          | types (SVG component)         |
+| 27  | `src/components/drivers/driver-performance.tsx` | types                         |
+| 28  | `src/components/drivers/driver-detail-view.tsx` | hos-clock, performance, store |
+| 29  | `src/routes/_app/fleet/drivers.tsx`             | driver-roster                 |
+| 30  | `src/routes/_app/fleet/drivers/$driverId.tsx`   | driver-detail-view            |
 
 ### Phase F — Truck Detail & Equipment
 
-| # | File | Depends On |
-|---|------|-----------|
-| 31 | `src/components/fleet/truck-schedule.tsx` | types, store |
-| 32 | `src/components/fleet/truck-detail-view.tsx` | truck-schedule, store |
-| 33 | `src/routes/_app/fleet/$truckId.tsx` | truck-detail-view |
-| 34 | `src/components/fleet/trailer-card.tsx` | types, status-badge |
-| 35 | `src/routes/_app/fleet/equipment.tsx` | trailer-card, store |
+| #   | File                                         | Depends On            |
+| --- | -------------------------------------------- | --------------------- |
+| 31  | `src/components/fleet/truck-schedule.tsx`    | types, store          |
+| 32  | `src/components/fleet/truck-detail-view.tsx` | truck-schedule, store |
+| 33  | `src/routes/_app/fleet/$truckId.tsx`         | truck-detail-view     |
+| 34  | `src/components/fleet/trailer-card.tsx`      | types, status-badge   |
+| 35  | `src/routes/_app/fleet/equipment.tsx`        | trailer-card, store   |
 
 ### Phase G — Brokerage
 
-| # | File | Depends On |
-|---|------|-----------|
-| 36 | `src/components/brokerage/lane-map.tsx` | react-leaflet, store |
-| 37 | `src/components/brokerage/board-load-card.tsx` | types, format |
-| 38 | `src/components/brokerage/rate-slider.tsx` | — |
-| 39 | `src/components/brokerage/carrier-match-card.tsx` | types, rate-slider |
-| 40 | `src/components/brokerage/carrier-match-sheet.tsx` | carrier-match-card, sheet |
-| 41 | `src/routes/_app/loads/board.tsx` | lane-map, board-load-card, carrier-match-sheet |
+| #   | File                                               | Depends On                                     |
+| --- | -------------------------------------------------- | ---------------------------------------------- |
+| 36  | `src/components/brokerage/lane-map.tsx`            | react-leaflet, store                           |
+| 37  | `src/components/brokerage/board-load-card.tsx`     | types, format                                  |
+| 38  | `src/components/brokerage/rate-slider.tsx`         | —                                              |
+| 39  | `src/components/brokerage/carrier-match-card.tsx`  | types, rate-slider                             |
+| 40  | `src/components/brokerage/carrier-match-sheet.tsx` | carrier-match-card, sheet                      |
+| 41  | `src/routes/_app/loads/board.tsx`                  | lane-map, board-load-card, carrier-match-sheet |
 
 ### Phase H — Directories
 
-| # | File | Depends On |
-|---|------|-----------|
-| 42 | `src/components/shippers/shipper-card.tsx` | types |
-| 43 | `src/components/shippers/shipper-detail-view.tsx` | types, store |
-| 44 | `src/routes/_app/more/shippers.tsx` | shipper-card |
-| 45 | `src/routes/_app/more/shippers/$shipperId.tsx` | shipper-detail-view |
-| 46 | `src/components/carriers/carrier-card.tsx` | types |
-| 47 | `src/components/carriers/carrier-scorecard.tsx` | types |
-| 48 | `src/components/carriers/carrier-detail-view.tsx` | carrier-scorecard, store |
-| 49 | `src/routes/_app/more/carriers.tsx` | carrier-card |
-| 50 | `src/routes/_app/more/carriers/$carrierId.tsx` | carrier-detail-view |
+| #   | File                                              | Depends On               |
+| --- | ------------------------------------------------- | ------------------------ |
+| 42  | `src/components/shippers/shipper-card.tsx`        | types                    |
+| 43  | `src/components/shippers/shipper-detail-view.tsx` | types, store             |
+| 44  | `src/routes/_app/more/shippers.tsx`               | shipper-card             |
+| 45  | `src/routes/_app/more/shippers/$shipperId.tsx`    | shipper-detail-view      |
+| 46  | `src/components/carriers/carrier-card.tsx`        | types                    |
+| 47  | `src/components/carriers/carrier-scorecard.tsx`   | types                    |
+| 48  | `src/components/carriers/carrier-detail-view.tsx` | carrier-scorecard, store |
+| 49  | `src/routes/_app/more/carriers.tsx`               | carrier-card             |
+| 50  | `src/routes/_app/more/carriers/$carrierId.tsx`    | carrier-detail-view      |
 
 ### Phase I — Communication & Notifications
 
-| # | File | Depends On |
-|---|------|-----------|
-| 51 | `src/components/communication/communication-feed.tsx` | types |
-| 52 | `src/components/communication/message-input.tsx` | store |
-| 53 | `src/components/communication/template-picker.tsx` | sheet |
-| 54 | `src/components/notifications/notification-item.tsx` | types, format |
-| 55 | `src/components/notifications/notification-center.tsx` | notification-item, store |
+| #   | File                                                   | Depends On               |
+| --- | ------------------------------------------------------ | ------------------------ |
+| 51  | `src/components/communication/communication-feed.tsx`  | types                    |
+| 52  | `src/components/communication/message-input.tsx`       | store                    |
+| 53  | `src/components/communication/template-picker.tsx`     | sheet                    |
+| 54  | `src/components/notifications/notification-item.tsx`   | types, format            |
+| 55  | `src/components/notifications/notification-center.tsx` | notification-item, store |
 
 ### Phase J — Document Management
 
-| # | File | Depends On |
-|---|------|-----------|
-| 56 | `src/components/documents/document-grid.tsx` | types |
-| 57 | `src/components/documents/document-viewer.tsx` | types, dialog |
-| 58 | `src/components/documents/document-capture.tsx` | sheet, store |
+| #   | File                                            | Depends On    |
+| --- | ----------------------------------------------- | ------------- |
+| 56  | `src/components/documents/document-grid.tsx`    | types         |
+| 57  | `src/components/documents/document-viewer.tsx`  | types, dialog |
+| 58  | `src/components/documents/document-capture.tsx` | sheet, store  |
 
 ### Phase K — Load Card Swipe Enhancement
 
-| # | File | Action |
-|---|------|--------|
-| 59 | `src/components/loads/load-card.tsx` | EDIT — add swipe gesture handlers |
+| #   | File                                 | Action                            |
+| --- | ------------------------------------ | --------------------------------- |
+| 59  | `src/components/loads/load-card.tsx` | EDIT — add swipe gesture handlers |
 
 ### Phase L — More Menu & Navigation Updates
 
-| # | File | Depends On |
-|---|------|-----------|
-| 60 | `src/routes/_app/more.tsx` | EDIT — add menu links to shippers, carriers, reports, demo controls |
-| 61 | `src/routes/_app/fleet.tsx` | EDIT — add sub-nav for drivers and equipment |
+| #   | File                        | Depends On                                                          |
+| --- | --------------------------- | ------------------------------------------------------------------- |
+| 60  | `src/routes/_app/more.tsx`  | EDIT — add menu links to shippers, carriers, reports, demo controls |
+| 61  | `src/routes/_app/fleet.tsx` | EDIT — add sub-nav for drivers and equipment                        |
 
 ### Summary
 

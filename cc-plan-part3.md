@@ -34,8 +34,8 @@
 bun add recharts
 ```
 
-| Package | Purpose |
-|---------|---------|
+| Package    | Purpose                                                      |
+| ---------- | ------------------------------------------------------------ |
 | `recharts` | Charting library (line, bar, area, pie, gauge) for analytics |
 
 **Optional** (for real Claude API integration):
@@ -45,6 +45,7 @@ bun add @anthropic-ai/sdk
 ```
 
 The AI chat works in two modes:
+
 1. **Simulated** (default): pattern-matching engine with pre-built responses
 2. **Live Claude API**: real API calls with system prompt containing demo state
 
@@ -101,7 +102,9 @@ The simulated mode is the default so the prototype works without an API key.
 
 ```tsx
 function AiScreen() {
-  const [activeTab, setActiveTab] = useState<'chat' | 'voice' | 'planning'>('chat')
+  const [activeTab, setActiveTab] = useState<'chat' | 'voice' | 'planning'>(
+    'chat',
+  )
 
   return (
     <div className="flex h-full flex-col">
@@ -135,11 +138,7 @@ function ChatInterface() {
     <div className="flex flex-1 flex-col">
       <ChatMessageList messages={messages} isTyping={isTyping} />
       <SuggestionChips onSelect={handleSuggestion} />
-      <ChatInputBar
-        value={input}
-        onChange={setInput}
-        onSend={handleSend}
-      />
+      <ChatInputBar value={input} onChange={setInput} onSend={handleSend} />
     </div>
   )
 }
@@ -159,6 +158,7 @@ interface ChatBubbleProps {
 ```
 
 Rendering by role:
+
 - **user**: right-aligned, blue background (`bg-freight-accent`), white text,
   rounded corners with sharp top-right
 - **assistant**: left-aligned, purple-tinted background (`bg-freight-ai/5`),
@@ -166,29 +166,34 @@ Rendering by role:
 - **system**: centered, gray background, small text, full width
 
 Rich content rendering within assistant bubbles:
+
 - `truck_comparison`: table with truck/driver data columns
 - `load_detail`: mini load card with key fields
 - `recommendation_cards`: list of dispatch recommendations (reuse `RecommendationCard` from Part 2)
 - `mini_map`: small Leaflet map instance showing relevant locations
 
 Action buttons within bubbles:
+
 ```tsx
-{message.actions.map((action) => (
-  <Button
-    key={action.label}
-    variant="outline"
-    size="sm"
-    onClick={() => handleAction(action)}
-    className="border-freight-ai text-freight-ai"
-  >
-    {action.label}
-  </Button>
-))}
+{
+  message.actions.map((action) => (
+    <Button
+      key={action.label}
+      variant="outline"
+      size="sm"
+      onClick={() => handleAction(action)}
+      className="border-freight-ai text-freight-ai"
+    >
+      {action.label}
+    </Button>
+  ))
+}
 ```
 
 #### 2.5 `TypingIndicator` — `src/components/ai/typing-indicator.tsx`
 
 Three pulsing dots:
+
 ```tsx
 export function TypingIndicator() {
   return (
@@ -212,17 +217,20 @@ export function TypingIndicator() {
 Context-aware chips above the input. Content depends on conversation state:
 
 **Default (no messages):**
+
 - "Show empty trucks"
 - "Tomorrow's plan"
 - "Unmatched loads"
 - "Exception summary"
 
 **After load context:**
+
 - "Assign this load"
 - "Find alternatives"
 - "Check lane rates"
 
 **After truck context:**
+
 - "Next load for this truck"
 - "Driver HOS status"
 - "Schedule overview"
@@ -253,7 +261,7 @@ interface ChatResponse {
   content: string
   richContent: RichContent | null
   actions: ChatAction[]
-  delay: number  // ms to simulate "thinking"
+  delay: number // ms to simulate "thinking"
 }
 
 export function getSimulatedResponse(userMessage: string): ChatResponse {
@@ -261,7 +269,11 @@ export function getSimulatedResponse(userMessage: string): ChatResponse {
   const msg = userMessage.toLowerCase()
 
   // Pattern: status/situation/overview
-  if (msg.includes('situation') || msg.includes('overview') || msg.includes('status')) {
+  if (
+    msg.includes('situation') ||
+    msg.includes('overview') ||
+    msg.includes('status')
+  ) {
     return buildOverviewResponse(state)
   }
 
@@ -271,7 +283,11 @@ export function getSimulatedResponse(userMessage: string): ChatResponse {
   }
 
   // Pattern: tomorrow / plan / forecast
-  if (msg.includes('tomorrow') || msg.includes('plan') || msg.includes('forecast')) {
+  if (
+    msg.includes('tomorrow') ||
+    msg.includes('plan') ||
+    msg.includes('forecast')
+  ) {
     return buildTomorrowPlanResponse(state)
   }
 
@@ -288,12 +304,20 @@ export function getSimulatedResponse(userMessage: string): ChatResponse {
   }
 
   // Pattern: exception / problem / issue
-  if (msg.includes('exception') || msg.includes('problem') || msg.includes('issue')) {
+  if (
+    msg.includes('exception') ||
+    msg.includes('problem') ||
+    msg.includes('issue')
+  ) {
     return buildExceptionResponse(state)
   }
 
   // Pattern: find truck for / need a truck / assign
-  if (msg.includes('find') || msg.includes('need a truck') || msg.includes('assign')) {
+  if (
+    msg.includes('find') ||
+    msg.includes('need a truck') ||
+    msg.includes('assign')
+  ) {
     return buildFindTruckResponse(state, msg)
   }
 
@@ -309,7 +333,8 @@ export function getSimulatedResponse(userMessage: string): ChatResponse {
 
   // Default: helpful fallback
   return {
-    content: `I can help you with dispatch operations. Try asking me about:\n\n` +
+    content:
+      `I can help you with dispatch operations. Try asking me about:\n\n` +
       `- **"What's the situation?"** — operations overview\n` +
       `- **"Show empty trucks"** — available capacity\n` +
       `- **"Tomorrow's plan"** — upcoming schedule\n` +
@@ -335,10 +360,13 @@ function buildOverviewResponse(state: StoreState): ChatResponse {
   const inTransit = loads.filter((l) => l.status === 'in_transit').length
   const atPickup = loads.filter((l) => l.status === 'at_pickup').length
   const empty = trucks.filter((t) => t.status === 'empty').length
-  const activeExceptions = exceptions.filter((e) => e.status === 'active').length
+  const activeExceptions = exceptions.filter(
+    (e) => e.status === 'active',
+  ).length
 
   return {
-    content: `Here's the current operations overview:\n\n` +
+    content:
+      `Here's the current operations overview:\n\n` +
       `📦 **${loads.length}** total loads (${inTransit} in transit, ${atPickup} at pickup)\n` +
       `🚛 **${trucks.length}** trucks (${empty} available)\n` +
       `⚠️ **${activeExceptions}** active exceptions\n\n` +
@@ -347,7 +375,11 @@ function buildOverviewResponse(state: StoreState): ChatResponse {
     actions: [
       { label: 'Show empty trucks', action: 'empty_trucks', entityId: null },
       { label: 'View exceptions', action: 'exceptions', entityId: null },
-      { label: 'Dispatch suggestions', action: 'recommendations', entityId: null },
+      {
+        label: 'Dispatch suggestions',
+        action: 'recommendations',
+        entityId: null,
+      },
     ],
     delay: 1200,
   }
@@ -364,7 +396,7 @@ import { useAppStore } from '@/store'
 
 const client = new Anthropic({
   apiKey: import.meta.env.VITE_ANTHROPIC_API_KEY,
-  dangerouslyAllowBrowser: true,  // client-side demo only
+  dangerouslyAllowBrowser: true, // client-side demo only
 })
 
 const SYSTEM_PROMPT = `You are the FreightOS AI Dispatch Assistant. You help dispatchers
@@ -385,7 +417,7 @@ Be concise and data-driven. Use bullet points.
 Reference specific entity IDs (e.g., T-208, LD-4521, Driver: James Wright).`
 
 export async function getClaudeResponse(
-  messages: Array<{ role: 'user' | 'assistant', content: string }>,
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>,
 ): Promise<string> {
   const state = useAppStore.getState()
 
@@ -409,7 +441,9 @@ function buildStateSummary(state: StoreState) {
   // - unassigned loads summary
   // - driver HOS summary
   // Keep under ~2000 tokens
-  return { /* ... */ }
+  return {
+    /* ... */
+  }
 }
 ```
 
@@ -423,10 +457,13 @@ const USE_CLAUDE = !!import.meta.env.VITE_ANTHROPIC_API_KEY
 
 export async function sendChatMessage(
   userMessage: string,
-  history: Array<{ role: 'user' | 'assistant', content: string }>,
+  history: Array<{ role: 'user' | 'assistant'; content: string }>,
 ): Promise<ChatResponse> {
   if (USE_CLAUDE) {
-    const text = await getClaudeResponse([...history, { role: 'user', content: userMessage }])
+    const text = await getClaudeResponse([
+      ...history,
+      { role: 'user', content: userMessage },
+    ])
     return { content: text, richContent: null, actions: [], delay: 0 }
   }
   return getSimulatedResponse(userMessage)
@@ -436,6 +473,7 @@ export async function sendChatMessage(
 ### 3.4 Planning Assistant — `src/components/ai/planning-assistant.tsx`
 
 A focused view for tomorrow's planning. Shows:
+
 - Demand forecast card (loads expected by hour)
 - Empty truck list with AI repositioning suggestions
 - Recommended spot loads to accept
@@ -467,13 +505,13 @@ export interface VoiceScenario {
   systemActions: SystemAction[]
   summary: string
   relatedLoadId: string | null
-  totalDuration: number      // seconds
+  totalDuration: number // seconds
 }
 
 export const VOICE_SCENARIOS: VoiceScenario[] = [
   {
     id: 'scenario-1',
-    name: 'Where\'s My Truck?',
+    name: "Where's My Truck?",
     description: 'Shipper calls asking about load status',
     direction: 'inbound',
     callerName: 'Sarah Mitchell',
@@ -481,29 +519,106 @@ export const VOICE_SCENARIOS: VoiceScenario[] = [
     callerPhone: '(404) 555-0188',
     topic: 'Load status inquiry',
     transcript: [
-      { speaker: 'agent', text: 'Good afternoon, FreightOS dispatch. This is the AI assistant speaking. How can I help you today?', timestamp: 0 },
-      { speaker: 'caller', text: 'Hi, this is Sarah from Southeast Distributors. I\'m calling about a shipment we\'re expecting.', timestamp: 5 },
-      { speaker: 'agent', text: 'Of course, Sarah. I can look that up for you right away. Do you have a load number or PO number?', timestamp: 11 },
-      { speaker: 'caller', text: 'Yes, it should be load number forty-five twenty-one.', timestamp: 17 },
-      { speaker: 'agent', text: 'I found load four-five-two-one. It\'s currently in transit from Atlanta to Memphis. Let me get you the latest position and ETA.', timestamp: 22 },
-      { speaker: 'caller', text: 'Great, we were expecting it by four PM today. Is that still on track?', timestamp: 30 },
-      { speaker: 'agent', text: 'The truck is currently about 45 miles west of Birmingham on I-20. Based on current conditions, the estimated arrival is four-thirty PM, which is about 30 minutes later than your original appointment window.', timestamp: 36 },
-      { speaker: 'caller', text: 'Oh, that\'s a little late. Is there any traffic or issues causing the delay?', timestamp: 48 },
-      { speaker: 'agent', text: 'There was some congestion near the Birmingham interchange earlier, but traffic has cleared. The driver, Mike Torres, is making good time now. Would you like me to send you a tracking link so you can monitor the arrival in real time?', timestamp: 54 },
-      { speaker: 'caller', text: 'Yes, that would be helpful. Can you also let our receiving team know about the updated time?', timestamp: 66 },
-      { speaker: 'agent', text: 'Absolutely. I\'ll send a tracking link to your email on file and notify your receiving dock about the four-thirty ETA. Is there anything else I can help with?', timestamp: 72 },
-      { speaker: 'caller', text: 'No, that\'s everything. Thank you!', timestamp: 80 },
-      { speaker: 'agent', text: 'You\'re welcome, Sarah. Have a great afternoon.', timestamp: 84 },
+      {
+        speaker: 'agent',
+        text: 'Good afternoon, FreightOS dispatch. This is the AI assistant speaking. How can I help you today?',
+        timestamp: 0,
+      },
+      {
+        speaker: 'caller',
+        text: "Hi, this is Sarah from Southeast Distributors. I'm calling about a shipment we're expecting.",
+        timestamp: 5,
+      },
+      {
+        speaker: 'agent',
+        text: 'Of course, Sarah. I can look that up for you right away. Do you have a load number or PO number?',
+        timestamp: 11,
+      },
+      {
+        speaker: 'caller',
+        text: 'Yes, it should be load number forty-five twenty-one.',
+        timestamp: 17,
+      },
+      {
+        speaker: 'agent',
+        text: "I found load four-five-two-one. It's currently in transit from Atlanta to Memphis. Let me get you the latest position and ETA.",
+        timestamp: 22,
+      },
+      {
+        speaker: 'caller',
+        text: 'Great, we were expecting it by four PM today. Is that still on track?',
+        timestamp: 30,
+      },
+      {
+        speaker: 'agent',
+        text: 'The truck is currently about 45 miles west of Birmingham on I-20. Based on current conditions, the estimated arrival is four-thirty PM, which is about 30 minutes later than your original appointment window.',
+        timestamp: 36,
+      },
+      {
+        speaker: 'caller',
+        text: "Oh, that's a little late. Is there any traffic or issues causing the delay?",
+        timestamp: 48,
+      },
+      {
+        speaker: 'agent',
+        text: 'There was some congestion near the Birmingham interchange earlier, but traffic has cleared. The driver, Mike Torres, is making good time now. Would you like me to send you a tracking link so you can monitor the arrival in real time?',
+        timestamp: 54,
+      },
+      {
+        speaker: 'caller',
+        text: 'Yes, that would be helpful. Can you also let our receiving team know about the updated time?',
+        timestamp: 66,
+      },
+      {
+        speaker: 'agent',
+        text: "Absolutely. I'll send a tracking link to your email on file and notify your receiving dock about the four-thirty ETA. Is there anything else I can help with?",
+        timestamp: 72,
+      },
+      {
+        speaker: 'caller',
+        text: "No, that's everything. Thank you!",
+        timestamp: 80,
+      },
+      {
+        speaker: 'agent',
+        text: "You're welcome, Sarah. Have a great afternoon.",
+        timestamp: 84,
+      },
     ],
     systemActions: [
-      { timestamp: 22, action: 'Searching for Load #4521...', result: 'Found: ATL→MEM, In Transit' },
-      { timestamp: 36, action: 'Calculating ETA from current position...', result: 'ETA: 4:30 PM (30 min late)' },
-      { timestamp: 54, action: 'Checking driver status for T-217...', result: 'Driver: Mike Torres, 8.2h HOS remaining' },
-      { timestamp: 72, action: 'Generating tracking link...', result: 'Link created: track.freightos.com/4521' },
-      { timestamp: 74, action: 'Sending email to sarah@southeast-dist.com', result: 'Email queued' },
-      { timestamp: 76, action: 'Updating delivery ETA to 4:30 PM', result: 'Load #4521 ETA updated' },
+      {
+        timestamp: 22,
+        action: 'Searching for Load #4521...',
+        result: 'Found: ATL→MEM, In Transit',
+      },
+      {
+        timestamp: 36,
+        action: 'Calculating ETA from current position...',
+        result: 'ETA: 4:30 PM (30 min late)',
+      },
+      {
+        timestamp: 54,
+        action: 'Checking driver status for T-217...',
+        result: 'Driver: Mike Torres, 8.2h HOS remaining',
+      },
+      {
+        timestamp: 72,
+        action: 'Generating tracking link...',
+        result: 'Link created: track.freightos.com/4521',
+      },
+      {
+        timestamp: 74,
+        action: 'Sending email to sarah@southeast-dist.com',
+        result: 'Email queued',
+      },
+      {
+        timestamp: 76,
+        action: 'Updating delivery ETA to 4:30 PM',
+        result: 'Load #4521 ETA updated',
+      },
     ],
-    summary: 'Shipper inquired about Load #4521 status. Provided current location (west of Birmingham), updated ETA (4:30 PM, 30 min late), and sent tracking link. Notified receiving dock of updated arrival time.',
+    summary:
+      'Shipper inquired about Load #4521 status. Provided current location (west of Birmingham), updated ETA (4:30 PM, 30 min late), and sent tracking link. Notified receiving dock of updated arrival time.',
     relatedLoadId: 'LD-4521',
     totalDuration: 88,
   },
@@ -523,9 +638,14 @@ export const VOICE_SCENARIOS: VoiceScenario[] = [
     callerCompany: 'Carolina Chemical Supply',
     callerPhone: '(704) 555-0234',
     topic: 'New load tender',
-    transcript: [/* ... 15-20 lines ... */],
-    systemActions: [/* ... 6-8 actions ... */],
-    summary: 'Shipper tendered new load CLT→JAX. Captured: 42,000 lbs chemical products, reefer at 55°F, pickup Feb 14 8AM. Rate quoted at $3.10/mi. Load created as LD-4580.',
+    transcript: [
+      /* ... 15-20 lines ... */
+    ],
+    systemActions: [
+      /* ... 6-8 actions ... */
+    ],
+    summary:
+      'Shipper tendered new load CLT→JAX. Captured: 42,000 lbs chemical products, reefer at 55°F, pickup Feb 14 8AM. Rate quoted at $3.10/mi. Load created as LD-4580.',
     relatedLoadId: null,
     totalDuration: 120,
   },
@@ -540,10 +660,15 @@ export const VOICE_SCENARIOS: VoiceScenario[] = [
     callerCompany: 'J&R Trucking',
     callerPhone: '(615) 555-0167',
     topic: 'Load offer and negotiation',
-    transcript: [/* ... 18-22 lines covering offer, rate discussion,
-                     counteroffer, acceptance */],
-    systemActions: [/* ... 5-7 actions ... */],
-    summary: 'Offered Load #4535 (ATL→MEM, $2.40/mi) to J&R Trucking. Carrier countered at $2.55/mi. Agreed at $2.50/mi. Load assigned to carrier.',
+    transcript: [
+      /* ... 18-22 lines covering offer, rate discussion,
+                     counteroffer, acceptance */
+    ],
+    systemActions: [
+      /* ... 5-7 actions ... */
+    ],
+    summary:
+      'Offered Load #4535 (ATL→MEM, $2.40/mi) to J&R Trucking. Carrier countered at $2.55/mi. Agreed at $2.50/mi. Load assigned to carrier.',
     relatedLoadId: 'LD-4535',
     totalDuration: 135,
   },
@@ -558,10 +683,15 @@ export const VOICE_SCENARIOS: VoiceScenario[] = [
     callerCompany: 'FreightOS Driver',
     callerPhone: '(404) 555-0123',
     topic: 'Breakdown report',
-    transcript: [/* ... 12-15 lines ... */],
-    systemActions: [/* ... 8-10 actions: create incident, check nearby trucks,
-                     initiate roadside, notify shipper, suggest reassignment */],
-    summary: 'Driver reported flat tire on I-20 at mile marker 223. Created breakdown event. Initiated roadside assistance (ETA 45 min). Notified shipper of delay. Recommended reassigning load to T-302 (28 miles away).',
+    transcript: [
+      /* ... 12-15 lines ... */
+    ],
+    systemActions: [
+      /* ... 8-10 actions: create incident, check nearby trucks,
+                     initiate roadside, notify shipper, suggest reassignment */
+    ],
+    summary:
+      'Driver reported flat tire on I-20 at mile marker 223. Created breakdown event. Initiated roadside assistance (ETA 45 min). Notified shipper of delay. Recommended reassigning load to T-302 (28 miles away).',
     relatedLoadId: 'LD-4521',
     totalDuration: 105,
   },
@@ -576,10 +706,15 @@ export const VOICE_SCENARIOS: VoiceScenario[] = [
     callerCompany: 'Peach State Logistics',
     callerPhone: '(770) 555-0145',
     topic: 'Appointment reschedule',
-    transcript: [/* ... 10-12 lines ... */],
-    systemActions: [/* ... 4-5 actions: check feasibility, check driver HOS impact,
-                     update appointment, confirm */],
-    summary: 'Shipper requested moving delivery from Thursday 2PM to Thursday 4PM. Checked driver HOS — feasible with 2h buffer. Updated appointment window. Confirmed with shipper.',
+    transcript: [
+      /* ... 10-12 lines ... */
+    ],
+    systemActions: [
+      /* ... 4-5 actions: check feasibility, check driver HOS impact,
+                     update appointment, confirm */
+    ],
+    summary:
+      'Shipper requested moving delivery from Thursday 2PM to Thursday 4PM. Checked driver HOS — feasible with 2h buffer. Updated appointment window. Confirmed with shipper.',
     relatedLoadId: 'LD-4525',
     totalDuration: 75,
   },
@@ -645,8 +780,8 @@ Full-screen immersive call experience with timed transcript playback.
 ```tsx
 function VoiceCallDemo({ scenario }: { scenario: VoiceScenario }) {
   const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTime, setCurrentTime] = useState(0)  // seconds
-  const [speed, setSpeed] = useState(1)               // 1x, 1.5x, 2x
+  const [currentTime, setCurrentTime] = useState(0) // seconds
+  const [speed, setSpeed] = useState(1) // 1x, 1.5x, 2x
   const intervalRef = useRef<ReturnType<typeof setInterval>>()
 
   // Tick every 100ms when playing
@@ -709,6 +844,7 @@ function VoiceCallDemo({ scenario }: { scenario: VoiceScenario }) {
 #### 5.1 `CallHeader` — `src/components/voice/call-header.tsx`
 
 Dark header showing:
+
 - "ACTIVE CALL" badge with pulsing dot (while playing)
 - Duration counter (formatted as M:SS)
 - Direction badge (Inbound / Outbound)
@@ -717,6 +853,7 @@ Dark header showing:
 #### 5.2 `TranscriptArea` — `src/components/voice/transcript-area.tsx`
 
 Split view layout:
+
 - Left column: caller's words (white text)
 - Right column: AI agent's words (purple-accented text)
 - New lines appear with fade-in animation
@@ -726,8 +863,11 @@ Split view layout:
   const lineStartTime = currentLine.timestamp
   const elapsed = currentTime - lineStartTime
   const words = currentLine.text.split(' ')
-  const wordsPerSecond = 2.5  // natural speaking pace
-  const visibleWordCount = Math.min(words.length, Math.floor(elapsed * wordsPerSecond))
+  const wordsPerSecond = 2.5 // natural speaking pace
+  const visibleWordCount = Math.min(
+    words.length,
+    Math.floor(elapsed * wordsPerSecond),
+  )
   ```
 - Highlighted keywords: certain words are marked (load numbers, locations, rates)
   with a subtle background highlight to show what the AI is "reacting to"
@@ -736,6 +876,7 @@ Split view layout:
 #### 5.3 `SystemActionFeed` — `src/components/voice/system-action-feed.tsx`
 
 Bottom panel showing AI's "thinking" during the call:
+
 - Each action shows as a log entry with icon:
   - 🔍 for searches
   - 📊 for calculations
@@ -803,6 +944,7 @@ If no active calls, shows a summary card with today's stats and a "Start Demo Ca
 button.
 
 Each live call card:
+
 - Pulsing green dot + "ACTIVE" + duration
 - Caller info
 - Topic badge
@@ -814,6 +956,7 @@ Each live call card:
 #### 6.2 `CallHistoryView` — `src/components/voice/call-history-view.tsx`
 
 Scrollable list of completed calls. Each entry:
+
 - Direction icon (↙ inbound / ↗ outbound)
 - Caller name + company
 - Duration
@@ -824,6 +967,7 @@ Scrollable list of completed calls. Each entry:
 #### 6.3 `CallPerformanceView` — `src/components/voice/call-performance-view.tsx`
 
 Metrics and charts (using Recharts):
+
 - Top metrics: calls today (12), avg duration (1:45), resolution rate (87%), transferred (2)
 - Bar chart: calls by hour
 - Line chart: resolution rate trend (7-day)
@@ -981,7 +1125,9 @@ to the voice call demo with scenario-1.
 
 ```tsx
 function ReportsScreen() {
-  const [range, setRange] = useState<'today' | 'week' | 'month' | 'custom'>('week')
+  const [range, setRange] = useState<'today' | 'week' | 'month' | 'custom'>(
+    'week',
+  )
 
   return (
     <div className="flex flex-col gap-4 overflow-y-auto p-4">
@@ -1002,6 +1148,7 @@ function ReportsScreen() {
 #### 8.2 `KpiStrip` — `src/components/reports/kpi-strip.tsx`
 
 Horizontal scroll of `MetricCard` instances:
+
 - On-time Pickup % (with trend arrow)
 - On-time Delivery %
 - Revenue per truck per week
@@ -1014,6 +1161,7 @@ Values computed from store data.
 #### 8.3 `RevenueMarginChart` — `src/components/reports/revenue-margin-chart.tsx`
 
 Recharts `ComposedChart` with:
+
 - `Bar` for weekly revenue
 - `Line` for margin percentage (secondary Y-axis)
 - Responsive container
@@ -1021,7 +1169,13 @@ Recharts `ComposedChart` with:
 
 ```tsx
 import {
-  ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer
+  ComposedChart,
+  Bar,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
 } from 'recharts'
 ```
 
@@ -1030,6 +1184,7 @@ Data: generate 7 weekly data points from store (or hardcoded demo data).
 #### 8.4 `LoadVolumeChart` — `src/components/reports/load-volume-chart.tsx`
 
 Recharts stacked `BarChart`:
+
 - Blue bars for carrier loads
 - Purple bars for brokered loads
 - Daily for past 7 days
@@ -1037,6 +1192,7 @@ Recharts stacked `BarChart`:
 #### 8.5 `LaneHeatMap` — `src/components/reports/lane-heat-map.tsx`
 
 Leaflet map showing lanes as lines colored by profitability:
+
 - Line width: proportional to load count
 - Line color: green (profitable) to red (low margin)
 - Tap a lane → popup with stats (load count, avg rate, avg margin)
@@ -1044,6 +1200,7 @@ Leaflet map showing lanes as lines colored by profitability:
 #### 8.6 `OnTimeGauges` — `src/components/reports/on-time-gauges.tsx`
 
 Two semicircular gauge charts (Recharts `PieChart` with custom `startAngle`/`endAngle`):
+
 - Pickup on-time %
 - Delivery on-time %
 - Target line at 95%
@@ -1056,12 +1213,14 @@ Recharts horizontal `BarChart` showing top 10 shippers by revenue.
 #### 8.8 `DriverScorecardList` — `src/components/reports/driver-scorecard-list.tsx`
 
 Ranked list of drivers by composite score. Each row:
+
 - Rank number, driver name, score (colored), mini bar showing score visually
 - Tap → navigate to driver detail
 
 #### 8.9 `AiImpactCard` — `src/components/reports/ai-impact-card.tsx`
 
 Card with AI-specific metrics:
+
 - Dispatches assisted by AI: count with percentage of total
 - Voice calls handled: count
 - Exceptions auto-resolved: count
@@ -1176,7 +1335,7 @@ const SCENARIOS = [
   {
     id: 'end_of_day',
     name: 'End of Day',
-    description: 'Wrapping up operations, reviewing tomorrow\'s plan',
+    description: "Wrapping up operations, reviewing tomorrow's plan",
     icon: '🌙',
   },
 ]
@@ -1189,6 +1348,7 @@ The snapshot is generated by `createSeedState()` with modified parameters
 ### 9.2 Time Simulator — `src/components/demo/time-simulator.tsx`
 
 Controls for the simulation clock (from `TimeSlice`):
+
 - Clock display: current simulated time
 - Elapsed: time since simulation start
 - Advance buttons: +15m, +1h, +4h (call `advanceTime()`)
@@ -1203,18 +1363,19 @@ disappear and their effects are visible in the app.
 
 Grid of 8 buttons, each triggering an immediate event:
 
-| Button | Action |
-|--------|--------|
-| Breakdown | Opens entity picker → creates exception for selected truck |
-| Cancellation | Opens entity picker → cancels selected load |
-| Weather | Opens region picker → creates weather exception for region |
-| Rate Spike | Opens lane picker → adjusts rates for selected lane |
-| New Load | Auto-generates a realistic new load in `tendered` status |
-| HOS Expiry | Opens driver picker → sets drive remaining to 0 |
-| Detention | Opens facility picker → creates detention exception |
-| Incoming Call | Opens scenario picker → navigates to voice demo |
+| Button        | Action                                                     |
+| ------------- | ---------------------------------------------------------- |
+| Breakdown     | Opens entity picker → creates exception for selected truck |
+| Cancellation  | Opens entity picker → cancels selected load                |
+| Weather       | Opens region picker → creates weather exception for region |
+| Rate Spike    | Opens lane picker → adjusts rates for selected lane        |
+| New Load      | Auto-generates a realistic new load in `tendered` status   |
+| HOS Expiry    | Opens driver picker → sets drive remaining to 0            |
+| Detention     | Opens facility picker → creates detention exception        |
+| Incoming Call | Opens scenario picker → navigates to voice demo            |
 
 Each injection:
+
 1. Shows a picker (if entity selection needed)
 2. Creates the event/exception in the store
 3. Shows a confirmation toast
@@ -1238,30 +1399,33 @@ elements and explanatory tooltips.
 
 ```tsx
 interface TourStep {
-  target: string              // CSS selector or data-slot value
+  target: string // CSS selector or data-slot value
   title: string
   description: string
   position: 'top' | 'bottom' | 'left' | 'right'
-  action?: () => void        // navigation or state change to show target
+  action?: () => void // navigation or state change to show target
 }
 
 const TOUR_STEPS: TourStep[] = [
   {
     target: '[data-slot="bottom-tab-bar"]',
     title: 'Navigation',
-    description: 'Five tabs give you quick access to all operations. Dashboard is your home base.',
+    description:
+      'Five tabs give you quick access to all operations. Dashboard is your home base.',
     position: 'top',
   },
   {
     target: '[data-slot="metric-card"]:first-child',
     title: 'KPI Dashboard',
-    description: 'Real-time metrics at a glance. Tap any card to drill into details.',
+    description:
+      'Real-time metrics at a glance. Tap any card to drill into details.',
     position: 'bottom',
   },
   {
     target: '[data-slot="ai-suggestion"]',
     title: 'AI Suggestions',
-    description: 'Purple-highlighted items are AI recommendations. The sparkle icon marks AI-generated content throughout the app.',
+    description:
+      'Purple-highlighted items are AI recommendations. The sparkle icon marks AI-generated content throughout the app.',
     position: 'bottom',
   },
   // ... 12 more steps covering:
@@ -1304,18 +1468,28 @@ function GuidedTour() {
         style={computeTooltipPosition(step.target, step.position)}
       >
         <div className="text-sm font-semibold">{step.title}</div>
-        <div className="mt-1 text-xs text-muted-foreground">{step.description}</div>
+        <div className="mt-1 text-xs text-muted-foreground">
+          {step.description}
+        </div>
         <div className="mt-3 flex items-center justify-between">
           <span className="text-xs text-muted-foreground">
             {currentStep + 1} of {TOUR_STEPS.length}
           </span>
           <div className="flex gap-2">
             {currentStep > 0 && (
-              <Button size="xs" variant="ghost" onClick={() => setCurrentStep((s) => s - 1)}>
+              <Button
+                size="xs"
+                variant="ghost"
+                onClick={() => setCurrentStep((s) => s - 1)}
+              >
                 Back
               </Button>
             )}
-            <Button size="xs" variant="ghost" onClick={() => setIsActive(false)}>
+            <Button
+              size="xs"
+              variant="ghost"
+              onClick={() => setIsActive(false)}
+            >
               Skip
             </Button>
             <Button
@@ -1374,7 +1548,8 @@ function SpotlightOverlay({ target }: { target: string }) {
         </mask>
       </defs>
       <rect
-        width="100%" height="100%"
+        width="100%"
+        height="100%"
         fill="rgba(0,0,0,0.6)"
         mask="url(#spotlight-mask)"
       />
@@ -1440,19 +1615,24 @@ function SpotlightOverlay({ target }: { target: string }) {
 
 ```css
 /* Card press effect */
-[data-slot="card"],
-[data-slot="metric-card"] {
+[data-slot='card'],
+[data-slot='metric-card'] {
   transition: transform 100ms ease-out;
 }
-[data-slot="card"]:active,
-[data-slot="metric-card"]:active {
+[data-slot='card']:active,
+[data-slot='metric-card']:active {
   transform: scale(0.98);
 }
 
 /* Pulse animation for active/current items */
 @keyframes freight-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 .animate-freight-pulse {
   animation: freight-pulse 2s ease-in-out infinite;
@@ -1460,19 +1640,28 @@ function SpotlightOverlay({ target }: { target: string }) {
 
 /* Skeleton shimmer */
 @keyframes freight-shimmer {
-  0% { background-position: -200px 0; }
-  100% { background-position: calc(200px + 100%) 0; }
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
 }
 
 /* Bottom sheet spring animation */
-[data-slot="sheet-content"] {
+[data-slot='sheet-content'] {
   transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 /* Voice waveform animation */
 @keyframes waveform-bar {
-  0%, 100% { height: 4px; }
-  50% { height: 20px; }
+  0%,
+  100% {
+    height: 4px;
+  }
+  50% {
+    height: 20px;
+  }
 }
 .waveform-bar {
   animation: waveform-bar 0.6s ease-in-out infinite;
@@ -1480,8 +1669,16 @@ function SpotlightOverlay({ target }: { target: string }) {
 
 /* Typing indicator */
 @keyframes typing-dot {
-  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-  40% { transform: scale(1); opacity: 1; }
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Fade in for new content */
@@ -1501,9 +1698,16 @@ function SpotlightOverlay({ target }: { target: string }) {
 
 /* Notification bell shake */
 @keyframes bell-shake {
-  0%, 100% { transform: rotate(0); }
-  25% { transform: rotate(15deg); }
-  75% { transform: rotate(-15deg); }
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(15deg);
+  }
+  75% {
+    transform: rotate(-15deg);
+  }
 }
 ```
 
@@ -1553,7 +1757,13 @@ Call `hapticLight()` on button taps, `hapticMedium()` on confirmations,
 ### 12.4 Voice Waveform Animation — `src/components/voice/waveform.tsx`
 
 ```tsx
-export function Waveform({ isActive, color = 'freight-ai' }: { isActive: boolean, color?: string }) {
+export function Waveform({
+  isActive,
+  color = 'freight-ai',
+}: {
+  isActive: boolean
+  color?: string
+}) {
   return (
     <div className="flex items-end gap-0.5">
       {Array.from({ length: 20 }, (_, i) => (
@@ -1639,7 +1849,9 @@ Add `<ToastContainer />` to the `_app.tsx` layout.
 export interface ChatSlice {
   chatMessages: ChatMessage[]
   addUserMessage: (content: string) => void
-  addAssistantMessage: (msg: Omit<ChatMessage, 'id' | 'timestamp' | 'role'>) => void
+  addAssistantMessage: (
+    msg: Omit<ChatMessage, 'id' | 'timestamp' | 'role'>,
+  ) => void
   clearChat: () => void
 }
 ```
@@ -1657,7 +1869,7 @@ export interface VoiceConfigSlice {
     loadAcceptanceEnabled: boolean
     maxRateCommitment: number
     escalationTriggers: string[]
-    operatingHours: Record<string, { open: string, close: string } | null>
+    operatingHours: Record<string, { open: string; close: string } | null>
     greeting: string
   }
   updateVoiceConfig: (updates: Partial<VoiceConfigSlice['voiceConfig']>) => void
@@ -1688,122 +1900,122 @@ into `src/store/index.ts`.
 
 ### Phase A — Dependencies & Store
 
-| # | File | Action |
-|---|------|--------|
-| 1 | `bun add recharts` | RUN |
-| 2 | `src/store/chat-slice.ts` | CREATE |
-| 3 | `src/store/voice-config-slice.ts` | CREATE |
-| 4 | `src/store/tour-slice.ts` | CREATE |
-| 5 | `src/store/index.ts` | EDIT — add new slices |
+| #   | File                              | Action                |
+| --- | --------------------------------- | --------------------- |
+| 1   | `bun add recharts`                | RUN                   |
+| 2   | `src/store/chat-slice.ts`         | CREATE                |
+| 3   | `src/store/voice-config-slice.ts` | CREATE                |
+| 4   | `src/store/tour-slice.ts`         | CREATE                |
+| 5   | `src/store/index.ts`              | EDIT — add new slices |
 
 ### Phase B — AI Chat Engine
 
-| # | File | Depends On |
-|---|------|-----------|
-| 6 | `src/services/ai-chat-simulated.ts` | store, types |
-| 7 | `src/services/ai-chat-claude.ts` | store, types (optional) |
-| 8 | `src/services/ai-chat.ts` | simulated, claude |
+| #   | File                                | Depends On              |
+| --- | ----------------------------------- | ----------------------- |
+| 6   | `src/services/ai-chat-simulated.ts` | store, types            |
+| 7   | `src/services/ai-chat-claude.ts`    | store, types (optional) |
+| 8   | `src/services/ai-chat.ts`           | simulated, claude       |
 
 ### Phase C — AI Chat Interface
 
-| # | File | Depends On |
-|---|------|-----------|
-| 9 | `src/components/ai/ai-header.tsx` | — |
-| 10 | `src/components/ai/chat-bubble.tsx` | types, recommendation-card |
-| 11 | `src/components/ai/typing-indicator.tsx` | — |
-| 12 | `src/components/ai/suggestion-chips.tsx` | store |
-| 13 | `src/components/ai/chat-input-bar.tsx` | — |
-| 14 | `src/components/ai/chat-message-list.tsx` | chat-bubble, typing-indicator |
-| 15 | `src/components/ai/chat-interface.tsx` | message-list, suggestion-chips, input-bar, service |
-| 16 | `src/components/ai/planning-assistant.tsx` | store, metric-card |
-| 17 | `src/routes/_app/ai.tsx` | REPLACE — add chat, voice, planning tabs |
+| #   | File                                       | Depends On                                         |
+| --- | ------------------------------------------ | -------------------------------------------------- |
+| 9   | `src/components/ai/ai-header.tsx`          | —                                                  |
+| 10  | `src/components/ai/chat-bubble.tsx`        | types, recommendation-card                         |
+| 11  | `src/components/ai/typing-indicator.tsx`   | —                                                  |
+| 12  | `src/components/ai/suggestion-chips.tsx`   | store                                              |
+| 13  | `src/components/ai/chat-input-bar.tsx`     | —                                                  |
+| 14  | `src/components/ai/chat-message-list.tsx`  | chat-bubble, typing-indicator                      |
+| 15  | `src/components/ai/chat-interface.tsx`     | message-list, suggestion-chips, input-bar, service |
+| 16  | `src/components/ai/planning-assistant.tsx` | store, metric-card                                 |
+| 17  | `src/routes/_app/ai.tsx`                   | REPLACE — add chat, voice, planning tabs           |
 
 ### Phase D — Voice Agent Scenarios & Engine
 
-| # | File | Depends On |
-|---|------|-----------|
-| 18 | `src/data/voice-scenarios.ts` | types |
-| 19 | `src/components/voice/call-header.tsx` | types |
-| 20 | `src/components/voice/transcript-area.tsx` | types |
-| 21 | `src/components/voice/system-action-feed.tsx` | types |
-| 22 | `src/components/voice/playback-controls.tsx` | — |
-| 23 | `src/components/voice/waveform.tsx` | — |
-| 24 | `src/components/voice/post-call-summary.tsx` | types |
-| 25 | `src/components/voice/voice-call-demo.tsx` | all voice sub-components |
+| #   | File                                          | Depends On               |
+| --- | --------------------------------------------- | ------------------------ |
+| 18  | `src/data/voice-scenarios.ts`                 | types                    |
+| 19  | `src/components/voice/call-header.tsx`        | types                    |
+| 20  | `src/components/voice/transcript-area.tsx`    | types                    |
+| 21  | `src/components/voice/system-action-feed.tsx` | types                    |
+| 22  | `src/components/voice/playback-controls.tsx`  | —                        |
+| 23  | `src/components/voice/waveform.tsx`           | —                        |
+| 24  | `src/components/voice/post-call-summary.tsx`  | types                    |
+| 25  | `src/components/voice/voice-call-demo.tsx`    | all voice sub-components |
 
 ### Phase E — Voice Dashboard
 
-| # | File | Depends On |
-|---|------|-----------|
-| 26 | `src/components/voice/live-calls-view.tsx` | store, types |
-| 27 | `src/components/voice/call-history-view.tsx` | store, types |
-| 28 | `src/components/voice/call-performance-view.tsx` | recharts, store |
-| 29 | `src/components/voice/voice-performance-metrics.tsx` | metric-card |
-| 30 | `src/components/voice/voice-settings.tsx` | store, shadcn components |
-| 31 | `src/components/voice/voice-dashboard.tsx` | all voice dashboard views |
+| #   | File                                                 | Depends On                |
+| --- | ---------------------------------------------------- | ------------------------- |
+| 26  | `src/components/voice/live-calls-view.tsx`           | store, types              |
+| 27  | `src/components/voice/call-history-view.tsx`         | store, types              |
+| 28  | `src/components/voice/call-performance-view.tsx`     | recharts, store           |
+| 29  | `src/components/voice/voice-performance-metrics.tsx` | metric-card               |
+| 30  | `src/components/voice/voice-settings.tsx`            | store, shadcn components  |
+| 31  | `src/components/voice/voice-dashboard.tsx`           | all voice dashboard views |
 
 ### Phase F — Analytics / Reports
 
-| # | File | Depends On |
-|---|------|-----------|
-| 32 | `src/components/reports/date-range-selector.tsx` | tabs |
-| 33 | `src/components/reports/kpi-strip.tsx` | metric-card, store |
-| 34 | `src/components/reports/revenue-margin-chart.tsx` | recharts |
-| 35 | `src/components/reports/load-volume-chart.tsx` | recharts |
-| 36 | `src/components/reports/lane-heat-map.tsx` | react-leaflet, store |
-| 37 | `src/components/reports/on-time-gauges.tsx` | recharts |
-| 38 | `src/components/reports/top-customers-chart.tsx` | recharts |
-| 39 | `src/components/reports/driver-scorecard-list.tsx` | store |
-| 40 | `src/components/reports/ai-impact-card.tsx` | store, metric-card |
-| 41 | `src/routes/_app/more/reports.tsx` | all report components |
+| #   | File                                               | Depends On            |
+| --- | -------------------------------------------------- | --------------------- |
+| 32  | `src/components/reports/date-range-selector.tsx`   | tabs                  |
+| 33  | `src/components/reports/kpi-strip.tsx`             | metric-card, store    |
+| 34  | `src/components/reports/revenue-margin-chart.tsx`  | recharts              |
+| 35  | `src/components/reports/load-volume-chart.tsx`     | recharts              |
+| 36  | `src/components/reports/lane-heat-map.tsx`         | react-leaflet, store  |
+| 37  | `src/components/reports/on-time-gauges.tsx`        | recharts              |
+| 38  | `src/components/reports/top-customers-chart.tsx`   | recharts              |
+| 39  | `src/components/reports/driver-scorecard-list.tsx` | store                 |
+| 40  | `src/components/reports/ai-impact-card.tsx`        | store, metric-card    |
+| 41  | `src/routes/_app/more/reports.tsx`                 | all report components |
 
 ### Phase G — Demo Controls
 
-| # | File | Depends On |
-|---|------|-----------|
-| 42 | `src/data/demo-scenarios.ts` | types, seed |
-| 43 | `src/components/demo/scenario-selector.tsx` | demo-scenarios, store |
-| 44 | `src/components/demo/time-simulator.tsx` | store |
-| 45 | `src/components/demo/event-injector.tsx` | store, types |
-| 46 | `src/components/demo/reset-controls.tsx` | store, seed, alert-dialog |
-| 47 | `src/routes/_app/more/demo.tsx` | all demo components |
+| #   | File                                        | Depends On                |
+| --- | ------------------------------------------- | ------------------------- |
+| 42  | `src/data/demo-scenarios.ts`                | types, seed               |
+| 43  | `src/components/demo/scenario-selector.tsx` | demo-scenarios, store     |
+| 44  | `src/components/demo/time-simulator.tsx`    | store                     |
+| 45  | `src/components/demo/event-injector.tsx`    | store, types              |
+| 46  | `src/components/demo/reset-controls.tsx`    | store, seed, alert-dialog |
+| 47  | `src/routes/_app/more/demo.tsx`             | all demo components       |
 
 ### Phase H — Guided Tour
 
-| # | File | Depends On |
-|---|------|-----------|
-| 48 | `src/data/tour-steps.ts` | — |
-| 49 | `src/components/tour/spotlight-overlay.tsx` | — |
-| 50 | `src/components/tour/guided-tour.tsx` | spotlight, tour-steps, store |
-| 51 | `src/routes/_app.tsx` | EDIT — add GuidedTour + ToastContainer |
+| #   | File                                        | Depends On                             |
+| --- | ------------------------------------------- | -------------------------------------- |
+| 48  | `src/data/tour-steps.ts`                    | —                                      |
+| 49  | `src/components/tour/spotlight-overlay.tsx` | —                                      |
+| 50  | `src/components/tour/guided-tour.tsx`       | spotlight, tour-steps, store           |
+| 51  | `src/routes/_app.tsx`                       | EDIT — add GuidedTour + ToastContainer |
 
 ### Phase I — Safety & Compliance
 
-| # | File | Depends On |
-|---|------|-----------|
-| 52 | `src/components/safety/hos-violation-risk.tsx` | store, types |
-| 53 | `src/components/safety/csa-scorecard.tsx` | — |
-| 54 | `src/components/safety/inspection-history.tsx` | — |
-| 55 | `src/routes/_app/more/safety.tsx` | safety components |
+| #   | File                                           | Depends On        |
+| --- | ---------------------------------------------- | ----------------- |
+| 52  | `src/components/safety/hos-violation-risk.tsx` | store, types      |
+| 53  | `src/components/safety/csa-scorecard.tsx`      | —                 |
+| 54  | `src/components/safety/inspection-history.tsx` | —                 |
+| 55  | `src/routes/_app/more/safety.tsx`              | safety components |
 
 ### Phase J — Polish & Utilities
 
-| # | File | Depends On |
-|---|------|-----------|
-| 56 | `src/lib/haptics.ts` | — |
-| 57 | `src/components/shared/toast.tsx` | — |
-| 58 | `src/styles.css` | EDIT — add all animation keyframes |
+| #   | File                              | Depends On                         |
+| --- | --------------------------------- | ---------------------------------- |
+| 56  | `src/lib/haptics.ts`              | —                                  |
+| 57  | `src/components/shared/toast.tsx` | —                                  |
+| 58  | `src/styles.css`                  | EDIT — add all animation keyframes |
 
 ### Phase K — More Menu Updates
 
-| # | File | Action |
-|---|------|--------|
-| 59 | `src/routes/_app/more.tsx` | EDIT — add links to reports, safety, demo |
+| #   | File                       | Action                                    |
+| --- | -------------------------- | ----------------------------------------- |
+| 59  | `src/routes/_app/more.tsx` | EDIT — add links to reports, safety, demo |
 
 ### Summary
 
 **New files: ~50** (3 services, 3 data files, 3 store slices, ~35 components, ~5 routes, 2 utility files)
-**Edited files: ~5** (store/index.ts, _app.tsx, more.tsx, ai.tsx, styles.css)
+**Edited files: ~5** (store/index.ts, \_app.tsx, more.tsx, ai.tsx, styles.css)
 
 ### Verification Checklist
 

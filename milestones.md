@@ -10,6 +10,7 @@
 ### Milestone 1 — Data Layer & Store (Part 1, Phases A-C)
 
 **What exists:**
+
 - All TypeScript interfaces defined in `src/data/types.ts`
 - Constants file with status colors, hub coordinates, nav config
 - Mock data generators producing 45 trucks, 30 drivers, 80 loads, 15 shippers, 25 carriers, 40 facilities
@@ -18,6 +19,7 @@
 - Utility libraries for geo calculations and formatting
 
 **What you can verify:**
+
 - `bun run build` passes with no TypeScript errors
 - In a test or console, `useAppStore.getState()` returns fully populated state
 - `Object.keys(state.trucks).length === 45`
@@ -31,6 +33,7 @@
 ### Milestone 2 — App Shell & Navigation (Part 1, Phases D-G)
 
 **What exists:**
+
 - 10 new shadcn components installed (tabs, skeleton, sheet, avatar, etc.)
 - FreightOS theme tokens in styles.css (status colors, surfaces, spacing)
 - Leaflet CSS overrides
@@ -39,6 +42,7 @@
 - 8 shared components (StatusBadge, MetricCard, SkeletonCard, FAB, etc.)
 
 **What you can verify:**
+
 - App launches on port 3000 with the new shell
 - Bottom tab bar is visible and fixed at the bottom
 - Tapping each tab navigates to a placeholder screen
@@ -53,12 +57,14 @@
 ### Milestone 3 — Dashboard Screen (Part 1, Phase H)
 
 **What exists:**
+
 - Dashboard with greeting bar, quick action strip, KPI grid, mini map, exception feed, schedule timeline
 - Mini Leaflet map showing truck positions as colored dots
 - Real numbers from store data (active loads count, available trucks, revenue, exceptions)
 - Exception cards with severity indicators and AI suggestions
 
 **What you can verify:**
+
 - Dashboard shows "Good morning/afternoon, Dispatcher" with current date
 - Status chips show real counts ("12 trucks rolling", "3 exceptions")
 - KPI grid shows 4 cards with real values (42 active loads, 18 available trucks, etc.)
@@ -74,6 +80,7 @@
 ### Milestone 4 — Fleet & Load Screens (Part 1, Phases I-K)
 
 **What exists:**
+
 - Fleet screen with full Leaflet map, truck markers, and filter chips
 - Truck list panel (drag-up sheet below map)
 - Load list screen with segment control (Active/Available/Completed)
@@ -82,6 +89,7 @@
 - FAB with speed-dial actions
 
 **What you can verify:**
+
 - Fleet tab shows all 45 trucks on the map with correct status colors
 - Filter chips work: "En Route" shows ~18 trucks, "Empty" shows ~9
 - Truck list cards show driver name, route, HOS remaining
@@ -101,6 +109,7 @@
 ### Milestone 5 — Load Detail & Lifecycle (Part 2, Phases A-C)
 
 **What exists:**
+
 - Load detail screen with 6 sections (route, assignment, lifecycle, financials, documents, communication)
 - Mini route map showing origin, destination, truck position, route line
 - Lifecycle stepper with correct progression and timestamps
@@ -111,6 +120,7 @@
 - New load form (bottom sheet)
 
 **What you can verify:**
+
 - Tap any load card → navigates to full detail screen
 - Route map shows correct origin/destination markers and route line
 - Lifecycle shows correct stage as "current" with pulsing indicator
@@ -127,6 +137,7 @@
 ### Milestone 6 — Dispatch Board & AI Recommendations (Part 2, Phases D-E)
 
 **What exists:**
+
 - Dispatch board with timeline and list views
 - 72-hour timeline showing truck schedules with load blocks and empty gaps
 - AI recommendation panel with scored suggestions
@@ -135,6 +146,7 @@
 - Recommendation cards showing factor breakdown
 
 **What you can verify:**
+
 - Timeline view shows truck rows with colored load blocks
 - Empty gaps are highlighted in amber
 - Tapping an empty gap triggers AI suggestion
@@ -151,6 +163,7 @@
 ### Milestone 7 — Full Operations Suite (Part 2, Phases F-L)
 
 **What exists:**
+
 - Driver roster with status filters
 - Driver detail with HOS clock SVG visualization
 - Truck detail with 72-hour schedule
@@ -163,6 +176,7 @@
 - Document viewer and simulated capture
 
 **What you can verify:**
+
 - Driver roster shows 30 drivers with correct HOS status
 - HOS clock SVG shows three concentric arcs (drive, on-duty, cycle)
 - Truck detail shows current load and next 3 days of schedule
@@ -183,6 +197,7 @@
 ### Milestone 8 — AI Chat & Voice Agent (Part 3, Phases A-E)
 
 **What exists:**
+
 - AI chat interface with message bubbles, typing indicator, suggestion chips
 - Simulated chat engine responding to 10+ query patterns with live data
 - Optional Claude API integration (when API key is set)
@@ -194,6 +209,7 @@
 - Voice call dashboard (live calls, history, performance, settings)
 
 **What you can verify:**
+
 - AI chat responds contextually to "What's the situation?" with real counts
 - Chat shows action buttons; tapping them triggers navigation or store updates
 - Suggestion chips change based on conversation context
@@ -211,6 +227,7 @@
 ### Milestone 9 — Reports & Demo Controls (Part 3, Phases F-H)
 
 **What exists:**
+
 - Reports screen with 7 chart cards (revenue/margin, load volume, lane heat map, gauges, customers, scorecards, AI impact)
 - Date range selector filtering data
 - Demo controls with 6 scenario presets
@@ -220,6 +237,7 @@
 - Guided tour system with 15 steps
 
 **What you can verify:**
+
 - Reports page renders all Recharts visualizations
 - Charts show data derived from store state
 - Lane heat map renders on Leaflet with colored lines
@@ -236,6 +254,7 @@
 ### Milestone 10 — Final Polish (Part 3, Phases I-K)
 
 **What exists:**
+
 - Safety & compliance dashboard with HOS risk list and CSA scores
 - Card press animations (scale 0.98 on tap)
 - Skeleton loading states on all screens
@@ -247,6 +266,7 @@
 - All More menu links wired up
 
 **What you can verify:**
+
 - Every screen loads without errors at 390px width
 - All navigation paths work (tab bar, detail screens, back buttons, deep links)
 - Full scenario walkthrough: New Load → AI Dispatch → Track → Deliver → Invoice
@@ -265,15 +285,15 @@
 
 ## Summary Table
 
-| # | Milestone | Stage | Key Deliverable | Demo-Ready? |
-|---|-----------|-------|-----------------|-------------|
-| 1 | Data Layer & Store | 1 | Types + seed data + store | No (no UI) |
-| 2 | App Shell & Navigation | 1 | Tab bar + shared components | Partial |
-| 3 | Dashboard Screen | 1 | Live KPIs + map + exceptions | Yes |
-| 4 | Fleet & Load Screens | 1 | Map + lists + filters | Yes |
-| 5 | Load Detail & Lifecycle | 2 | Full load journey | Yes |
-| 6 | Dispatch & AI Recs | 2 | AI scoring + assignment flow | Yes |
-| 7 | Full Operations Suite | 2 | All operational screens | Yes |
-| 8 | AI Chat & Voice Agent | 3 | Chat + voice playback | Yes |
-| 9 | Reports & Demo Controls | 3 | Analytics + scenarios | Yes |
-| 10 | Final Polish | 3 | Animations + tour + safety | Yes (Final) |
+| #   | Milestone               | Stage | Key Deliverable              | Demo-Ready? |
+| --- | ----------------------- | ----- | ---------------------------- | ----------- |
+| 1   | Data Layer & Store      | 1     | Types + seed data + store    | No (no UI)  |
+| 2   | App Shell & Navigation  | 1     | Tab bar + shared components  | Partial     |
+| 3   | Dashboard Screen        | 1     | Live KPIs + map + exceptions | Yes         |
+| 4   | Fleet & Load Screens    | 1     | Map + lists + filters        | Yes         |
+| 5   | Load Detail & Lifecycle | 2     | Full load journey            | Yes         |
+| 6   | Dispatch & AI Recs      | 2     | AI scoring + assignment flow | Yes         |
+| 7   | Full Operations Suite   | 2     | All operational screens      | Yes         |
+| 8   | AI Chat & Voice Agent   | 3     | Chat + voice playback        | Yes         |
+| 9   | Reports & Demo Controls | 3     | Analytics + scenarios        | Yes         |
+| 10  | Final Polish            | 3     | Animations + tour + safety   | Yes (Final) |

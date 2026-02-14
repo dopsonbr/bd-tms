@@ -33,13 +33,13 @@
 bun add zustand leaflet react-leaflet @types/leaflet date-fns
 ```
 
-| Package | Purpose |
-|---------|---------|
-| `zustand` | Lightweight state management with slices pattern |
-| `leaflet` | Map rendering engine (lighter than Mapbox, no API key) |
-| `react-leaflet` | React bindings for Leaflet |
-| `@types/leaflet` | TypeScript definitions for Leaflet |
-| `date-fns` | Date formatting/math (tree-shakeable, no moment.js bloat) |
+| Package          | Purpose                                                   |
+| ---------------- | --------------------------------------------------------- |
+| `zustand`        | Lightweight state management with slices pattern          |
+| `leaflet`        | Map rendering engine (lighter than Mapbox, no API key)    |
+| `react-leaflet`  | React bindings for Leaflet                                |
+| `@types/leaflet` | TypeScript definitions for Leaflet                        |
+| `date-fns`       | Date formatting/math (tree-shakeable, no moment.js bloat) |
 
 ### 1.2 Add shadcn Components
 
@@ -71,17 +71,17 @@ shadcn tokens. These are the design-doc colors converted to OKLCh.
 
 ```css
 /* --- FreightOS Status Colors --- */
---freight-navy: oklch(0.18 0.04 255);          /* #0F1B2D */
---freight-accent: oklch(0.58 0.18 250);        /* #2D7FF9 */
---freight-success: oklch(0.68 0.17 163);       /* #00B67A */
---freight-warning: oklch(0.76 0.14 75);        /* #F5A623 */
---freight-critical: oklch(0.57 0.22 27);       /* #E74C3C */
---freight-idle: oklch(0.66 0.02 250);          /* #8E99A4 */
---freight-ai: oklch(0.53 0.22 285);            /* #7C5CFC */
+--freight-navy: oklch(0.18 0.04 255); /* #0F1B2D */
+--freight-accent: oklch(0.58 0.18 250); /* #2D7FF9 */
+--freight-success: oklch(0.68 0.17 163); /* #00B67A */
+--freight-warning: oklch(0.76 0.14 75); /* #F5A623 */
+--freight-critical: oklch(0.57 0.22 27); /* #E74C3C */
+--freight-idle: oklch(0.66 0.02 250); /* #8E99A4 */
+--freight-ai: oklch(0.53 0.22 285); /* #7C5CFC */
 
 /* --- FreightOS Surfaces --- */
---freight-bg: oklch(0.97 0.005 250);           /* #F5F7FA */
---freight-card: oklch(1 0 0);                  /* #FFFFFF */
+--freight-bg: oklch(0.97 0.005 250); /* #F5F7FA */
+--freight-card: oklch(1 0 0); /* #FFFFFF */
 --freight-overlay: oklch(0.18 0.04 255 / 60%); /* navy 60% */
 
 /* --- Spacing shortcuts --- */
@@ -121,11 +121,16 @@ Every interface is fully specified below. Copy the entire block.
 ```ts
 /* ─── Primitives ─────────────────────────────────────────────── */
 
-export type LatLng = { lat: number, lng: number }
+export type LatLng = { lat: number; lng: number }
 
-export type EntityId = string   // e.g. 'T-201', 'DRV-001', 'LD-4521'
+export type EntityId = string // e.g. 'T-201', 'DRV-001', 'LD-4521'
 
-export type EquipmentType = 'dry_van' | 'reefer' | 'flatbed' | 'step_deck' | 'tanker'
+export type EquipmentType =
+  | 'dry_van'
+  | 'reefer'
+  | 'flatbed'
+  | 'step_deck'
+  | 'tanker'
 
 export type TruckStatus =
   | 'en_route'
@@ -179,67 +184,67 @@ export type Sentiment = 'positive' | 'neutral' | 'negative'
 /* ─── Core Entities ──────────────────────────────────────────── */
 
 export interface Truck {
-  id: EntityId                    // 'T-201'
+  id: EntityId // 'T-201'
   equipmentType: EquipmentType
   status: TruckStatus
   position: LatLng
-  heading: number                 // degrees 0-360
+  heading: number // degrees 0-360
   currentLoadId: EntityId | null
   driverId: EntityId | null
   trailerId: EntityId | null
   mileage: number
   nextMaintenanceMiles: number
-  hub: string                     // 'ATL', 'MEM', etc.
-  speed: number                   // mph, 0 when stopped
+  hub: string // 'ATL', 'MEM', etc.
+  speed: number // mph, 0 when stopped
 }
 
 export interface Driver {
-  id: EntityId                    // 'DRV-001'
+  id: EntityId // 'DRV-001'
   name: string
   phone: string
   photoUrl: string | null
   cdlNumber: string
-  cdlExpiry: string               // ISO date
-  endorsements: string[]          // 'H', 'T', 'N', etc.
-  homeBase: string                // city code
+  cdlExpiry: string // ISO date
+  endorsements: string[] // 'H', 'T', 'N', etc.
+  homeBase: string // city code
   truckId: EntityId | null
   hos: HosStatus
-  performanceScore: number        // 0-100
-  preferredLanes: string[]        // 'ATL-MEM', 'MEM-NSH'
+  performanceScore: number // 0-100
+  preferredLanes: string[] // 'ATL-MEM', 'MEM-NSH'
   status: 'available' | 'driving' | 'on_duty' | 'off_duty' | 'reset'
   certifiedEquipment: EquipmentType[]
-  hireDate: string                // ISO date
+  hireDate: string // ISO date
 }
 
 export interface HosStatus {
   phase: DriverHosPhase
-  driveRemaining: number          // minutes
-  onDutyRemaining: number         // minutes
-  cycleRemaining: number          // minutes (70-hr / 8-day)
-  nextBreakDue: number            // minutes until 30-min break required
-  resetStartedAt: string | null   // ISO datetime
-  lastUpdated: string             // ISO datetime
+  driveRemaining: number // minutes
+  onDutyRemaining: number // minutes
+  cycleRemaining: number // minutes (70-hr / 8-day)
+  nextBreakDue: number // minutes until 30-min break required
+  resetStartedAt: string | null // ISO datetime
+  lastUpdated: string // ISO datetime
 }
 
 export interface Load {
-  id: EntityId                    // 'LD-4521'
+  id: EntityId // 'LD-4521'
   type: LoadType
   status: LoadStatus
   origin: FacilityStop
   destination: FacilityStop
-  stops: FacilityStop[]           // for multi-stop; includes origin & dest
+  stops: FacilityStop[] // for multi-stop; includes origin & dest
   commodity: string
-  weight: number                  // lbs
+  weight: number // lbs
   equipmentRequired: EquipmentType
-  temperature: number | null      // for reefer, fahrenheit
-  rate: number                    // dollars
+  temperature: number | null // for reefer, fahrenheit
+  rate: number // dollars
   ratePerMile: number
-  distance: number                // miles
+  distance: number // miles
   fuelSurcharge: number
   accessorials: Accessorial[]
   totalRevenue: number
-  carrierCost: number | null      // for brokered loads
-  margin: number | null           // for brokered loads
+  carrierCost: number | null // for brokered loads
+  margin: number | null // for brokered loads
   marginPercent: number | null
   assignedTruckId: EntityId | null
   assignedDriverId: EntityId | null
@@ -250,9 +255,9 @@ export interface Load {
   lifecycle: LifecycleEvent[]
   documents: LoadDocument[]
   communications: CommunicationEntry[]
-  routePolyline: LatLng[]         // array of points for map line
-  currentPosition: LatLng | null  // truck position on route
-  createdAt: string               // ISO datetime
+  routePolyline: LatLng[] // array of points for map line
+  currentPosition: LatLng | null // truck position on route
+  createdAt: string // ISO datetime
   updatedAt: string
 }
 
@@ -263,7 +268,7 @@ export interface FacilityStop {
   city: string
   state: string
   position: LatLng
-  appointmentWindow: { start: string, end: string } // ISO datetimes
+  appointmentWindow: { start: string; end: string } // ISO datetimes
   actualArrival: string | null
   actualDeparture: string | null
   stopType: 'pickup' | 'delivery' | 'stop'
@@ -279,16 +284,22 @@ export interface Accessorial {
 
 export interface LifecycleEvent {
   status: LoadStatus
-  timestamp: string              // ISO datetime
-  actor: string                  // 'system', 'dispatcher', 'driver', 'ai'
+  timestamp: string // ISO datetime
+  actor: string // 'system', 'dispatcher', 'driver', 'ai'
   note: string
 }
 
 export interface LoadDocument {
   id: string
-  type: 'bol' | 'pod' | 'rate_confirmation' | 'scale_ticket' | 'lumper_receipt' | 'other'
+  type:
+    | 'bol'
+    | 'pod'
+    | 'rate_confirmation'
+    | 'scale_ticket'
+    | 'lumper_receipt'
+    | 'other'
   name: string
-  thumbnailUrl: string           // placeholder image
+  thumbnailUrl: string // placeholder image
   uploadedAt: string
   status: 'received' | 'pending' | 'missing'
 }
@@ -296,7 +307,13 @@ export interface LoadDocument {
 export interface CommunicationEntry {
   id: string
   timestamp: string
-  source: 'dispatcher' | 'driver' | 'ai_agent' | 'system' | 'shipper' | 'carrier'
+  source:
+    | 'dispatcher'
+    | 'driver'
+    | 'ai_agent'
+    | 'system'
+    | 'shipper'
+    | 'carrier'
   type: 'note' | 'call' | 'text' | 'voice_transcript' | 'system_event'
   content: string
   isAi: boolean
@@ -305,7 +322,7 @@ export interface CommunicationEntry {
 /* ─── Brokerage Entities ─────────────────────────────────────── */
 
 export interface Shipper {
-  id: EntityId                   // 'SHP-001'
+  id: EntityId // 'SHP-001'
   name: string
   contactName: string
   phone: string
@@ -313,24 +330,24 @@ export interface Shipper {
   address: string
   city: string
   state: string
-  industry: string               // 'manufacturing', 'distribution', etc.
+  industry: string // 'manufacturing', 'distribution', etc.
   activeLoadCount: number
-  averageVolume: number          // loads per week
-  averageRate: number            // per mile
-  paymentTerms: number           // days
+  averageVolume: number // loads per week
+  averageRate: number // per mile
+  paymentTerms: number // days
   lanes: LaneHistory[]
 }
 
 export interface LaneHistory {
-  origin: string                 // city code
+  origin: string // city code
   destination: string
   loadCount: number
   averageRate: number
-  lastShipped: string            // ISO date
+  lastShipped: string // ISO date
 }
 
 export interface Carrier {
-  id: EntityId                   // 'CAR-001'
+  id: EntityId // 'CAR-001'
   name: string
   contactName: string
   phone: string
@@ -339,36 +356,42 @@ export interface Carrier {
   dotNumber: string
   fleetSize: number
   equipmentTypes: EquipmentType[]
-  serviceArea: string[]          // state codes
+  serviceArea: string[] // state codes
   scorecard: CarrierScorecard
   status: 'active' | 'pending' | 'suspended'
   preferredLanes: string[]
-  insuranceExpiry: string        // ISO date
+  insuranceExpiry: string // ISO date
   paymentTerms: 'standard_30' | 'quick_pay'
 }
 
 export interface CarrierScorecard {
-  onTimePickup: number           // percentage
+  onTimePickup: number // percentage
   onTimeDelivery: number
-  claimsRatio: number            // percentage
-  communicationScore: number     // 0-100
-  overallScore: number           // 0-100
+  claimsRatio: number // percentage
+  communicationScore: number // 0-100
+  overallScore: number // 0-100
   totalLoads: number
-  lastLoadDate: string           // ISO date
+  lastLoadDate: string // ISO date
 }
 
 /* ─── Facilities ─────────────────────────────────────────────── */
 
 export interface Facility {
-  id: EntityId                   // 'FAC-001'
+  id: EntityId // 'FAC-001'
   name: string
   address: string
   city: string
   state: string
   position: LatLng
-  type: 'shipper_warehouse' | 'receiver_warehouse' | 'distribution_center' | 'port' | 'rail_yard' | 'truck_stop'
-  operatingHours: { open: string, close: string } // 'HH:MM'
-  averageDwellTime: number       // minutes
+  type:
+    | 'shipper_warehouse'
+    | 'receiver_warehouse'
+    | 'distribution_center'
+    | 'port'
+    | 'rail_yard'
+    | 'truck_stop'
+  operatingHours: { open: string; close: string } // 'HH:MM'
+  averageDwellTime: number // minutes
   hasDropTrailer: boolean
   dockCount: number
 }
@@ -376,13 +399,13 @@ export interface Facility {
 /* ─── Trailer ────────────────────────────────────────────────── */
 
 export interface Trailer {
-  id: EntityId                   // 'TRL-001'
+  id: EntityId // 'TRL-001'
   type: EquipmentType
   status: 'loaded' | 'empty' | 'in_maintenance'
   position: LatLng
   assignedTruckId: EntityId | null
   assignedLoadId: EntityId | null
-  lastInspection: string         // ISO date
+  lastInspection: string // ISO date
 }
 
 /* ─── Exceptions / Notifications ─────────────────────────────── */
@@ -396,7 +419,7 @@ export interface Exception {
   driverId: EntityId | null
   title: string
   description: string
-  detectedAt: string             // ISO datetime
+  detectedAt: string // ISO datetime
   resolvedAt: string | null
   aiSuggestion: string | null
   status: 'active' | 'acknowledged' | 'resolved'
@@ -425,10 +448,10 @@ export interface VoiceCall {
   topic: string
   startedAt: string
   endedAt: string | null
-  duration: number               // seconds
+  duration: number // seconds
   outcome: CallOutcome
   sentiment: Sentiment
-  confidence: number             // 0-100
+  confidence: number // 0-100
   transcript: TranscriptLine[]
   systemActions: SystemAction[]
   summary: string | null
@@ -438,13 +461,13 @@ export interface VoiceCall {
 export interface TranscriptLine {
   speaker: 'caller' | 'agent'
   text: string
-  timestamp: number              // seconds from call start
+  timestamp: number // seconds from call start
 }
 
 export interface SystemAction {
-  timestamp: number              // seconds from call start
-  action: string                 // 'Searching for Load #4521...'
-  result: string | null          // 'Found: ATL→MEM, ETA 4:30 PM'
+  timestamp: number // seconds from call start
+  action: string // 'Searching for Load #4521...'
+  result: string | null // 'Found: ATL→MEM, ETA 4:30 PM'
 }
 
 /* ─── AI Dispatch ────────────────────────────────────────────── */
@@ -454,16 +477,16 @@ export interface DispatchRecommendation {
   loadId: EntityId
   truckId: EntityId
   driverId: EntityId
-  score: number                  // 0-100
+  score: number // 0-100
   confidence: 'high' | 'medium' | 'low'
   factors: MatchFactor[]
   status: 'pending' | 'accepted' | 'rejected' | 'modified'
 }
 
 export interface MatchFactor {
-  name: string                   // 'deadhead_miles', 'hos_remaining', etc.
-  value: string                  // '18 mi', '9.2 hrs'
-  score: number                  // 0-100 contribution
+  name: string // 'deadhead_miles', 'hos_remaining', etc.
+  value: string // '18 mi', '9.2 hrs'
+  score: number // 0-100 contribution
   description: string
 }
 
@@ -485,15 +508,20 @@ export interface RichContent {
 
 export interface ChatAction {
   label: string
-  action: string                 // handler key
+  action: string // handler key
   entityId: EntityId | null
 }
 
 /* ─── Demo / Time ────────────────────────────────────────────── */
 
 export interface TimeEvent {
-  triggerMinute: number          // minutes from sim start
-  type: ExceptionType | 'load_tender' | 'delivery_complete' | 'pickup_complete' | 'hos_expiry'
+  triggerMinute: number // minutes from sim start
+  type:
+    | ExceptionType
+    | 'load_tender'
+    | 'delivery_complete'
+    | 'pickup_complete'
+    | 'hos_expiry'
   targetEntityId: EntityId
   description: string
   data: Record<string, unknown>
@@ -521,7 +549,7 @@ export interface StoreState {
   recommendations: DispatchRecommendation[]
   chatMessages: ChatMessage[]
   timeEvents: TimeEvent[]
-  simulatedTime: string          // ISO datetime
+  simulatedTime: string // ISO datetime
   selectedScenario: string | null
 }
 ```
@@ -615,7 +643,7 @@ export const LOAD_LIFECYCLE_ORDER: LoadStatus[] = [
 
 /* ─── Hub coordinates ────────────────────────────────────────── */
 
-export const HUBS: Record<string, { label: string, position: LatLng }> = {
+export const HUBS: Record<string, { label: string; position: LatLng }> = {
   ATL: { label: 'Atlanta, GA', position: { lat: 33.749, lng: -84.388 } },
   MEM: { label: 'Memphis, TN', position: { lat: 35.1495, lng: -90.049 } },
   NSH: { label: 'Nashville, TN', position: { lat: 36.1627, lng: -86.7816 } },
@@ -641,16 +669,31 @@ export const NAV_TABS = [
 
 export const QUICK_ACTIONS = [
   { id: 'new_load', label: 'New Load', icon: 'Plus', color: 'freight-accent' },
-  { id: 'dispatch_ai', label: 'Dispatch AI', icon: 'Sparkles', color: 'freight-ai' },
-  { id: 'voice_agent', label: 'Voice Agent', icon: 'Phone', color: 'freight-success' },
-  { id: 'find_truck', label: 'Find Truck', icon: 'MapPin', color: 'freight-warning' },
+  {
+    id: 'dispatch_ai',
+    label: 'Dispatch AI',
+    icon: 'Sparkles',
+    color: 'freight-ai',
+  },
+  {
+    id: 'voice_agent',
+    label: 'Voice Agent',
+    icon: 'Phone',
+    color: 'freight-success',
+  },
+  {
+    id: 'find_truck',
+    label: 'Find Truck',
+    icon: 'MapPin',
+    color: 'freight-warning',
+  },
 ] as const
 
 /* ─── Margin thresholds (for color-coding) ───────────────────── */
 
 export const MARGIN_THRESHOLDS = {
-  good: 15,     // >= 15% → green
-  warning: 8,   // >= 8% → yellow
+  good: 15, // >= 15% → green
+  warning: 8, // >= 8% → yellow
   // below 8% → red
 }
 ```
@@ -699,11 +742,12 @@ IDs:  T-201..T-230 (dry_van), T-301..T-310 (reefer), T-401..T-405 (flatbed)
 For each truck, distribute across hubs using round-robin:
 
 ```ts
-const hubKeys = Object.keys(HUBS)   // ATL, MEM, NSH, CLT, JAX, BHM
+const hubKeys = Object.keys(HUBS) // ATL, MEM, NSH, CLT, JAX, BHM
 // truck index % hubKeys.length → hub assignment
 ```
 
 Fields:
+
 - `position`: hub position + small random offset (±0.3 degrees)
 - `heading`: random 0–360
 - `status`: weighted distribution — 40% en_route, 15% at_pickup, 10% at_delivery, 20% empty, 10% at_rest, 5% out_of_service
@@ -719,6 +763,7 @@ IDs:  DRV-001..DRV-030
 ```
 
 Use realistic Southeast US names. Distribute HOS:
+
 - 8 drivers with 480+ min drive remaining (8+ hrs)
 - 10 drivers with 240–480 min (4–8 hrs)
 - 7 drivers with < 240 min (< 4 hrs)
@@ -735,6 +780,7 @@ IDs:  SHP-001..SHP-015
 ```
 
 Use realistic company names by industry:
+
 - Manufacturing: "Piedmont Steel Works", "Carolina Chemical Supply", etc.
 - Distribution: "Southeast Distribution Co", "Peach State Logistics", etc.
 - Retail: "Dixie Home Furnishings", "SunBelt Auto Parts", etc.
@@ -750,6 +796,7 @@ IDs:  CAR-001..CAR-025
 ```
 
 Fleet sizes: 1–10 trucks. Scorecards:
+
 - `onTimePickup`: 78–99%
 - `onTimeDelivery`: 80–99%
 - `claimsRatio`: 0.2–4.5%
@@ -759,6 +806,7 @@ Fleet sizes: 1–10 trucks. Scorecards:
 #### 5.5 `generateFacilities()` — 40 facilities
 
 Distribute across Southeast US. Types:
+
 - 15 shipper warehouses
 - 12 receiver warehouses
 - 8 distribution centers
@@ -774,6 +822,7 @@ IDs:  LD-4500..LD-4579
 ```
 
 Status distribution per requirements:
+
 - 20 in_transit
 - 15 at_pickup
 - 10 at_delivery
@@ -784,6 +833,7 @@ Status distribution per requirements:
 Type split: 55 carrier, 25 brokered.
 
 Rate ranges:
+
 - Local (< 200mi): $1.80–$2.50/mi
 - Regional (200–500mi): $2.20–$3.00/mi
 - Long-haul (500+mi): $2.50–$3.50/mi
@@ -801,6 +851,7 @@ generated data. AI suggestions are realistic strings.
 #### 5.8 `generateTimeEvents()` — 12 events
 
 Follows the design doc timeline:
+
 - Minutes 0–120: 2 pickup complete, 1 delivery complete
 - Minutes 120–240: truck T-217 traffic delay → late exception
 - Minutes 240–360: 2 new load tenders
@@ -870,18 +921,20 @@ import { createShipperSlice, type ShipperSlice } from './shipper-slice'
 import { createCarrierSlice, type CarrierSlice } from './carrier-slice'
 import { createTimeSlice, type TimeSlice } from './time-slice'
 import { createUiSlice, type UiSlice } from './ui-slice'
-import { createNotificationSlice, type NotificationSlice } from './notification-slice'
+import {
+  createNotificationSlice,
+  type NotificationSlice,
+} from './notification-slice'
 import { createSeedState } from '@/data/seed'
 
-export type AppStore =
-  & FleetSlice
-  & DriverSlice
-  & LoadSlice
-  & ShipperSlice
-  & CarrierSlice
-  & TimeSlice
-  & UiSlice
-  & NotificationSlice
+export type AppStore = FleetSlice &
+  DriverSlice &
+  LoadSlice &
+  ShipperSlice &
+  CarrierSlice &
+  TimeSlice &
+  UiSlice &
+  NotificationSlice
 
 export const useAppStore = create<AppStore>()((...args) => ({
   ...createFleetSlice(...args),
@@ -914,7 +967,10 @@ export interface FleetSlice {
   getTrucksByHub: (hub: string) => Truck[]
 }
 
-export const createFleetSlice: StateCreator<FleetSlice, [], [], FleetSlice> = (set, get) => ({
+export const createFleetSlice: StateCreator<FleetSlice, [], [], FleetSlice> = (
+  set,
+  get,
+) => ({
   trucks: {},
   updateTruckPosition: (id, lat, lng) =>
     set((state) => ({
@@ -937,8 +993,10 @@ export const createFleetSlice: StateCreator<FleetSlice, [], [], FleetSlice> = (s
         [truckId]: { ...state.trucks[truckId], driverId },
       },
     })),
-  getTrucksByStatus: (status) => Object.values(get().trucks).filter((t) => t.status === status),
-  getTrucksByHub: (hub) => Object.values(get().trucks).filter((t) => t.hub === hub),
+  getTrucksByStatus: (status) =>
+    Object.values(get().trucks).filter((t) => t.status === status),
+  getTrucksByHub: (hub) =>
+    Object.values(get().trucks).filter((t) => t.hub === hub),
 })
 ```
 
@@ -966,7 +1024,7 @@ export interface TimeSlice {
   simulatedTime: string
   timeEvents: TimeEvent[]
   isPlaying: boolean
-  playbackSpeed: number          // 1, 2, 5, 10
+  playbackSpeed: number // 1, 2, 5, 10
   advanceTime: (minutes: number) => void
   setPlaybackSpeed: (speed: number) => void
   togglePlayback: () => void
@@ -1079,7 +1137,8 @@ export function useFilteredLoads(filters: FilterOptions): Load[] {
     }
 
     return result.sort(
-      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
     )
   }, [loads, filters])
 }
@@ -1130,7 +1189,9 @@ export function distanceMiles(a: LatLng, b: LatLng): number {
   const dLng = toRad(b.lng - a.lng)
   const sinLat = Math.sin(dLat / 2)
   const sinLng = Math.sin(dLng / 2)
-  const h = sinLat * sinLat + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * sinLng * sinLng
+  const h =
+    sinLat * sinLat +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * sinLng * sinLng
   return 2 * R * Math.asin(Math.sqrt(h))
 }
 
@@ -1156,8 +1217,10 @@ export function interpolatePolyline(polyline: LatLng[], t: number): LatLng {
     if (traveled + segDist >= targetDist) {
       const segT = (targetDist - traveled) / segDist
       return {
-        lat: polyline[i - 1].lat + (polyline[i].lat - polyline[i - 1].lat) * segT,
-        lng: polyline[i - 1].lng + (polyline[i].lng - polyline[i - 1].lng) * segT,
+        lat:
+          polyline[i - 1].lat + (polyline[i].lat - polyline[i - 1].lat) * segT,
+        lng:
+          polyline[i - 1].lng + (polyline[i].lng - polyline[i - 1].lng) * segT,
       }
     }
     traveled += segDist
@@ -1225,7 +1288,10 @@ export function formatMinutesToHours(minutes: number): string {
   return `${h}h ${m}m`
 }
 
-export function formatMargin(margin: number | null, percent: number | null): string {
+export function formatMargin(
+  margin: number | null,
+  percent: number | null,
+): string {
   if (margin === null || percent === null) return '—'
   return `${formatCurrency(margin)} (${formatPercent(percent)})`
 }
@@ -1312,13 +1378,7 @@ ASCII wireframe of the app shell:
 'use client'
 
 import { useRouter, useMatches } from '@tanstack/react-router'
-import {
-  LayoutDashboard,
-  Package,
-  Truck,
-  Sparkles,
-  Menu,
-} from 'lucide-react'
+import { LayoutDashboard, Package, Truck, Sparkles, Menu } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { NAV_TABS } from '@/data/constants'
 
@@ -1342,7 +1402,9 @@ export function BottomTabBar() {
         'grid grid-cols-5 border-t border-border bg-card',
         'pb-[var(--freight-safe-bottom)]',
       )}
-      style={{ height: `calc(var(--freight-tab-height) + var(--freight-safe-bottom))` }}
+      style={{
+        height: `calc(var(--freight-tab-height) + var(--freight-safe-bottom))`,
+      }}
     >
       {NAV_TABS.map((tab) => {
         const Icon = ICONS[tab.icon as keyof typeof ICONS]
@@ -1355,9 +1417,7 @@ export function BottomTabBar() {
             className={cn(
               'flex flex-col items-center justify-center gap-0.5',
               'text-[11px] font-medium transition-colors',
-              isActive
-                ? 'text-freight-accent'
-                : 'text-muted-foreground',
+              isActive ? 'text-freight-accent' : 'text-muted-foreground',
             )}
           >
             <Icon className="size-5" strokeWidth={isActive ? 2 : 1.5} />
@@ -1469,12 +1529,12 @@ or opens a sheet.
 
 2x2 grid using `MetricCard` component (see Section 13.2). Cards:
 
-| Card | Value source | Label | Navigation |
-|------|-------------|-------|------------|
-| Active Loads | `Object.values(loads).filter(l => !['delivered','invoiced','cancelled'].includes(l.status)).length` | "Active Loads" | `/loads` |
-| Available Trucks | `getTrucksByStatus('empty').length` | "Available Trucks" | `/fleet` |
-| Today's Revenue | Sum of `totalRevenue` for loads delivered today | "Today's Revenue" | `/more/reports` |
-| Exceptions | `Object.values(exceptions).filter(e => e.status === 'active').length` | "Exceptions" | scroll to exception feed |
+| Card             | Value source                                                                                        | Label              | Navigation               |
+| ---------------- | --------------------------------------------------------------------------------------------------- | ------------------ | ------------------------ |
+| Active Loads     | `Object.values(loads).filter(l => !['delivered','invoiced','cancelled'].includes(l.status)).length` | "Active Loads"     | `/loads`                 |
+| Available Trucks | `getTrucksByStatus('empty').length`                                                                 | "Available Trucks" | `/fleet`                 |
+| Today's Revenue  | Sum of `totalRevenue` for loads delivered today                                                     | "Today's Revenue"  | `/more/reports`          |
+| Exceptions       | `Object.values(exceptions).filter(e => e.status === 'active').length`                               | "Exceptions"       | scroll to exception feed |
 
 Each `MetricCard` shows the value, label, and a trend indicator (hardcoded for demo).
 
@@ -1499,6 +1559,7 @@ Scrollable list of `ExceptionCard` components. Sorted by severity (critical firs
 then by `detectedAt` (newest first). Max 5 visible, "View All" link at bottom.
 
 `ExceptionCard` sub-component:
+
 - Left: severity color stripe (4px)
 - Severity icon (circle with color)
 - Title: `"LATE PICKUP — Load #4521"`
@@ -1583,6 +1644,7 @@ function FleetScreen() {
 #### 11.2 `FleetFilterBar` — `src/components/fleet/fleet-filter-bar.tsx`
 
 Horizontal scroll of pill-shaped toggle buttons:
+
 - "All" (default, null filter)
 - "En Route" → `en_route`
 - "Empty" → `empty`
@@ -1662,7 +1724,9 @@ Scrollable list of `TruckCard` components. Each card:
 
 ```tsx
 function LoadListScreen() {
-  const [segment, setSegment] = useState<'active' | 'available' | 'completed'>('active')
+  const [segment, setSegment] = useState<'active' | 'available' | 'completed'>(
+    'active',
+  )
   const [filters, setFilters] = useState<FilterOptions>({})
 
   return (
@@ -1680,6 +1744,7 @@ function LoadListScreen() {
 #### 12.1 `SegmentControl` — `src/components/loads/segment-control.tsx`
 
 Three-way toggle built on shadcn `Tabs`:
+
 - **Active**: loads with status not in [delivered, invoiced, cancelled, tendered]
 - **Available**: unmatched loads (status = tendered | accepted, no assignedTruckId) — broker view
 - **Completed**: delivered + invoiced loads from last 7 days
@@ -1687,6 +1752,7 @@ Three-way toggle built on shadcn `Tabs`:
 #### 12.2 `LoadFilterBar` — `src/components/loads/load-filter-bar.tsx`
 
 Horizontal scroll of dropdown pills:
+
 - Status: dropdown with all LoadStatus values
 - Origin: dropdown with hub city codes
 - Destination: dropdown with hub city codes
@@ -1705,6 +1771,7 @@ Shows empty state when no matches.
 Props: `load: Load`
 
 Layout per design doc:
+
 ```
 ┌──────────────────────────────────────────┐
 │  #4521        DRY VAN        $2,850      │
@@ -1740,7 +1807,11 @@ See Section 13.5.
 'use client'
 
 import { cn } from '@/lib/utils'
-import { LOAD_STATUS_COLOR, LOAD_STATUS_LABEL, TRUCK_STATUS_COLOR } from '@/data/constants'
+import {
+  LOAD_STATUS_COLOR,
+  LOAD_STATUS_LABEL,
+  TRUCK_STATUS_COLOR,
+} from '@/data/constants'
 import type { LoadStatus, TruckStatus } from '@/data/types'
 
 interface StatusBadgeProps {
@@ -1749,7 +1820,11 @@ interface StatusBadgeProps {
   className?: string
 }
 
-export function StatusBadge({ status, type = 'load', className }: StatusBadgeProps) {
+export function StatusBadge({
+  status,
+  type = 'load',
+  className,
+}: StatusBadgeProps) {
   const colorMap = type === 'load' ? LOAD_STATUS_COLOR : TRUCK_STATUS_COLOR
   const label =
     type === 'load'
@@ -1784,8 +1859,8 @@ import { Card } from '@/components/ui/card'
 interface MetricCardProps {
   value: string | number
   label: string
-  trend?: { direction: 'up' | 'down', value: string }
-  trendPositive?: 'up' | 'down'  // which direction is "good"
+  trend?: { direction: 'up' | 'down'; value: string }
+  trendPositive?: 'up' | 'down' // which direction is "good"
   onClick?: () => void
   className?: string
 }
@@ -1891,7 +1966,9 @@ export function FloatingActionButton({ onAction }: FabProps) {
       <div
         className={cn(
           'mb-3 flex flex-col items-end gap-2 transition-all',
-          isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
+          isOpen
+            ? 'opacity-100 translate-y-0'
+            : 'opacity-0 translate-y-4 pointer-events-none',
         )}
       >
         {FAB_ACTIONS.map((action) => (
@@ -1933,11 +2010,15 @@ import { cn } from '@/lib/utils'
 
 interface SectionHeaderProps {
   title: string
-  action?: { label: string, onClick: () => void }
+  action?: { label: string; onClick: () => void }
   className?: string
 }
 
-export function SectionHeader({ title, action, className }: SectionHeaderProps) {
+export function SectionHeader({
+  title,
+  action,
+  className,
+}: SectionHeaderProps) {
   return (
     <div className={cn('flex items-center justify-between', className)}>
       <h2 className="text-lg font-semibold text-foreground">{title}</h2>
@@ -1967,9 +2048,19 @@ interface EmptyStateProps {
   className?: string
 }
 
-export function EmptyState({ icon: Icon, title, description, className }: EmptyStateProps) {
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  className,
+}: EmptyStateProps) {
   return (
-    <div className={cn('flex flex-col items-center justify-center gap-3 py-12', className)}>
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center gap-3 py-12',
+        className,
+      )}
+    >
       <div className="flex size-12 items-center justify-center rounded-full bg-muted">
         <Icon className="size-6 text-muted-foreground" />
       </div>
@@ -1995,7 +2086,10 @@ interface AiSuggestionBannerProps {
   className?: string
 }
 
-export function AiSuggestionBanner({ text, className }: AiSuggestionBannerProps) {
+export function AiSuggestionBanner({
+  text,
+  className,
+}: AiSuggestionBannerProps) {
   return (
     <div
       data-slot="ai-suggestion"
@@ -2020,125 +2114,126 @@ are listed so you know what must exist first.
 
 ### Phase A — Data Layer (no UI dependencies)
 
-| # | File | Depends On |
-|---|------|-----------|
-| 1 | `src/data/types.ts` | nothing |
-| 2 | `src/data/constants.ts` | types.ts |
-| 3 | `src/lib/geo.ts` | types.ts |
-| 4 | `src/lib/format.ts` | nothing (date-fns) |
-| 5 | `src/data/generators.ts` | types.ts, constants.ts, geo.ts |
-| 6 | `src/data/seed.ts` | generators.ts, types.ts |
+| #   | File                     | Depends On                     |
+| --- | ------------------------ | ------------------------------ |
+| 1   | `src/data/types.ts`      | nothing                        |
+| 2   | `src/data/constants.ts`  | types.ts                       |
+| 3   | `src/lib/geo.ts`         | types.ts                       |
+| 4   | `src/lib/format.ts`      | nothing (date-fns)             |
+| 5   | `src/data/generators.ts` | types.ts, constants.ts, geo.ts |
+| 6   | `src/data/seed.ts`       | generators.ts, types.ts        |
 
 ### Phase B — Store (depends on data layer)
 
-| # | File | Depends On |
-|---|------|-----------|
-| 7 | `src/store/fleet-slice.ts` | types.ts |
-| 8 | `src/store/driver-slice.ts` | types.ts |
-| 9 | `src/store/load-slice.ts` | types.ts |
-| 10 | `src/store/shipper-slice.ts` | types.ts |
-| 11 | `src/store/carrier-slice.ts` | types.ts |
-| 12 | `src/store/time-slice.ts` | types.ts |
-| 13 | `src/store/ui-slice.ts` | types.ts |
-| 14 | `src/store/notification-slice.ts` | types.ts |
-| 15 | `src/store/index.ts` | all slices, seed.ts |
+| #   | File                              | Depends On          |
+| --- | --------------------------------- | ------------------- |
+| 7   | `src/store/fleet-slice.ts`        | types.ts            |
+| 8   | `src/store/driver-slice.ts`       | types.ts            |
+| 9   | `src/store/load-slice.ts`         | types.ts            |
+| 10  | `src/store/shipper-slice.ts`      | types.ts            |
+| 11  | `src/store/carrier-slice.ts`      | types.ts            |
+| 12  | `src/store/time-slice.ts`         | types.ts            |
+| 13  | `src/store/ui-slice.ts`           | types.ts            |
+| 14  | `src/store/notification-slice.ts` | types.ts            |
+| 15  | `src/store/index.ts`              | all slices, seed.ts |
 
 ### Phase C — Hooks (depends on store)
 
-| # | File | Depends On |
-|---|------|-----------|
-| 16 | `src/hooks/use-simulation.ts` | store |
-| 17 | `src/hooks/use-filtered-loads.ts` | store, types.ts |
-| 18 | `src/hooks/use-filtered-trucks.ts` | store, types.ts |
-| 19 | `src/hooks/use-map.ts` | types.ts, constants.ts |
+| #   | File                               | Depends On             |
+| --- | ---------------------------------- | ---------------------- |
+| 16  | `src/hooks/use-simulation.ts`      | store                  |
+| 17  | `src/hooks/use-filtered-loads.ts`  | store, types.ts        |
+| 18  | `src/hooks/use-filtered-trucks.ts` | store, types.ts        |
+| 19  | `src/hooks/use-map.ts`             | types.ts, constants.ts |
 
 ### Phase D — shadcn Components (run CLI)
 
-| # | Component | Command |
-|---|-----------|---------|
-| 20 | tabs | `npx shadcn@latest add tabs` |
-| 21 | skeleton | `npx shadcn@latest add skeleton` |
-| 22 | scroll-area | `npx shadcn@latest add scroll-area` |
-| 23 | sheet | `npx shadcn@latest add sheet` |
-| 24 | avatar | `npx shadcn@latest add avatar` |
-| 25 | progress | `npx shadcn@latest add progress` |
-| 26 | tooltip | `npx shadcn@latest add tooltip` |
-| 27 | toggle | `npx shadcn@latest add toggle` |
-| 28 | switch | `npx shadcn@latest add switch` |
-| 29 | dialog | `npx shadcn@latest add dialog` |
+| #   | Component   | Command                             |
+| --- | ----------- | ----------------------------------- |
+| 20  | tabs        | `npx shadcn@latest add tabs`        |
+| 21  | skeleton    | `npx shadcn@latest add skeleton`    |
+| 22  | scroll-area | `npx shadcn@latest add scroll-area` |
+| 23  | sheet       | `npx shadcn@latest add sheet`       |
+| 24  | avatar      | `npx shadcn@latest add avatar`      |
+| 25  | progress    | `npx shadcn@latest add progress`    |
+| 26  | tooltip     | `npx shadcn@latest add tooltip`     |
+| 27  | toggle      | `npx shadcn@latest add toggle`      |
+| 28  | switch      | `npx shadcn@latest add switch`      |
+| 29  | dialog      | `npx shadcn@latest add dialog`      |
 
 ### Phase E — Theme Tokens
 
-| # | File | Action |
-|---|------|--------|
-| 30 | `src/styles.css` | EDIT — add FreightOS custom properties + Leaflet overrides |
+| #   | File             | Action                                                     |
+| --- | ---------------- | ---------------------------------------------------------- |
+| 30  | `src/styles.css` | EDIT — add FreightOS custom properties + Leaflet overrides |
 
 ### Phase F — Shared Components
 
-| # | File | Depends On |
-|---|------|-----------|
-| 31 | `src/components/shared/status-badge.tsx` | constants.ts, types.ts |
-| 32 | `src/components/shared/metric-card.tsx` | card, utils |
-| 33 | `src/components/shared/skeleton-card.tsx` | skeleton, card |
-| 34 | `src/components/shared/pull-to-refresh.tsx` | nothing |
-| 35 | `src/components/shared/fab.tsx` | lucide-react |
-| 36 | `src/components/shared/section-header.tsx` | utils |
-| 37 | `src/components/shared/empty-state.tsx` | lucide-react |
-| 38 | `src/components/shared/ai-suggestion-banner.tsx` | lucide-react |
+| #   | File                                             | Depends On             |
+| --- | ------------------------------------------------ | ---------------------- |
+| 31  | `src/components/shared/status-badge.tsx`         | constants.ts, types.ts |
+| 32  | `src/components/shared/metric-card.tsx`          | card, utils            |
+| 33  | `src/components/shared/skeleton-card.tsx`        | skeleton, card         |
+| 34  | `src/components/shared/pull-to-refresh.tsx`      | nothing                |
+| 35  | `src/components/shared/fab.tsx`                  | lucide-react           |
+| 36  | `src/components/shared/section-header.tsx`       | utils                  |
+| 37  | `src/components/shared/empty-state.tsx`          | lucide-react           |
+| 38  | `src/components/shared/ai-suggestion-banner.tsx` | lucide-react           |
 
 ### Phase G — App Shell
 
-| # | File | Depends On |
-|---|------|-----------|
-| 39 | `src/components/shell/bottom-tab-bar.tsx` | constants.ts, router |
-| 40 | `src/routes/_app.tsx` | bottom-tab-bar, use-simulation |
+| #   | File                                      | Depends On                     |
+| --- | ----------------------------------------- | ------------------------------ |
+| 39  | `src/components/shell/bottom-tab-bar.tsx` | constants.ts, router           |
+| 40  | `src/routes/_app.tsx`                     | bottom-tab-bar, use-simulation |
 
 ### Phase H — Dashboard Screen
 
-| # | File | Depends On |
-|---|------|-----------|
-| 41 | `src/components/dashboard/greeting-bar.tsx` | store, format.ts |
-| 42 | `src/components/dashboard/quick-actions-strip.tsx` | constants.ts |
-| 43 | `src/components/dashboard/kpi-grid.tsx` | metric-card, store |
-| 44 | `src/components/dashboard/mini-map.tsx` | react-leaflet, store, constants.ts |
-| 45 | `src/components/dashboard/exception-card.tsx` | status-badge, ai-suggestion-banner, store |
-| 46 | `src/components/dashboard/exception-feed.tsx` | exception-card, section-header, store |
-| 47 | `src/components/dashboard/schedule-event.tsx` | format.ts |
-| 48 | `src/components/dashboard/schedule-timeline.tsx` | schedule-event, section-header |
-| 49 | `src/routes/_app/index.tsx` | all dashboard components |
+| #   | File                                               | Depends On                                |
+| --- | -------------------------------------------------- | ----------------------------------------- |
+| 41  | `src/components/dashboard/greeting-bar.tsx`        | store, format.ts                          |
+| 42  | `src/components/dashboard/quick-actions-strip.tsx` | constants.ts                              |
+| 43  | `src/components/dashboard/kpi-grid.tsx`            | metric-card, store                        |
+| 44  | `src/components/dashboard/mini-map.tsx`            | react-leaflet, store, constants.ts        |
+| 45  | `src/components/dashboard/exception-card.tsx`      | status-badge, ai-suggestion-banner, store |
+| 46  | `src/components/dashboard/exception-feed.tsx`      | exception-card, section-header, store     |
+| 47  | `src/components/dashboard/schedule-event.tsx`      | format.ts                                 |
+| 48  | `src/components/dashboard/schedule-timeline.tsx`   | schedule-event, section-header            |
+| 49  | `src/routes/_app/index.tsx`                        | all dashboard components                  |
 
 ### Phase I — Fleet Screen
 
-| # | File | Depends On |
-|---|------|-----------|
-| 50 | `src/components/fleet/fleet-header.tsx` | utils |
-| 51 | `src/components/fleet/fleet-filter-bar.tsx` | constants.ts |
-| 52 | `src/components/fleet/truck-card.tsx` | status-badge, format.ts, store |
-| 53 | `src/components/fleet/truck-map-marker.tsx` | types.ts, constants.ts |
-| 54 | `src/components/fleet/fleet-map-view.tsx` | react-leaflet, truck-map-marker, store |
-| 55 | `src/components/fleet/truck-list-panel.tsx` | truck-card, sheet |
-| 56 | `src/routes/_app/fleet.tsx` | all fleet components |
+| #   | File                                        | Depends On                             |
+| --- | ------------------------------------------- | -------------------------------------- |
+| 50  | `src/components/fleet/fleet-header.tsx`     | utils                                  |
+| 51  | `src/components/fleet/fleet-filter-bar.tsx` | constants.ts                           |
+| 52  | `src/components/fleet/truck-card.tsx`       | status-badge, format.ts, store         |
+| 53  | `src/components/fleet/truck-map-marker.tsx` | types.ts, constants.ts                 |
+| 54  | `src/components/fleet/fleet-map-view.tsx`   | react-leaflet, truck-map-marker, store |
+| 55  | `src/components/fleet/truck-list-panel.tsx` | truck-card, sheet                      |
+| 56  | `src/routes/_app/fleet.tsx`                 | all fleet components                   |
 
 ### Phase J — Load List Screen
 
-| # | File | Depends On |
-|---|------|-----------|
-| 57 | `src/components/loads/segment-control.tsx` | tabs |
-| 58 | `src/components/loads/load-filter-bar.tsx` | constants.ts, select |
-| 59 | `src/components/loads/load-card.tsx` | card, status-badge, ai-suggestion-banner, format.ts |
-| 60 | `src/components/loads/load-list.tsx` | load-card, use-filtered-loads, empty-state |
-| 61 | `src/routes/_app/loads.tsx` | all loads components, fab |
+| #   | File                                       | Depends On                                          |
+| --- | ------------------------------------------ | --------------------------------------------------- |
+| 57  | `src/components/loads/segment-control.tsx` | tabs                                                |
+| 58  | `src/components/loads/load-filter-bar.tsx` | constants.ts, select                                |
+| 59  | `src/components/loads/load-card.tsx`       | card, status-badge, ai-suggestion-banner, format.ts |
+| 60  | `src/components/loads/load-list.tsx`       | load-card, use-filtered-loads, empty-state          |
+| 61  | `src/routes/_app/loads.tsx`                | all loads components, fab                           |
 
 ### Phase K — Placeholder Screens
 
-| # | File | Purpose |
-|---|------|---------|
-| 62 | `src/routes/_app/ai.tsx` | Placeholder: "AI Agent — Coming in Part 3" |
-| 63 | `src/routes/_app/more.tsx` | Placeholder: "More — Coming in Part 2" |
+| #   | File                       | Purpose                                    |
+| --- | -------------------------- | ------------------------------------------ |
+| 62  | `src/routes/_app/ai.tsx`   | Placeholder: "AI Agent — Coming in Part 3" |
+| 63  | `src/routes/_app/more.tsx` | Placeholder: "More — Coming in Part 2"     |
 
 ### Summary
 
 **Total new files: 63**
+
 - Data layer: 6 files
 - Store: 9 files
 - Hooks: 4 files
