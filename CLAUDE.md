@@ -11,8 +11,9 @@ FreightOS (bd-tms) — a mobile-first (390px / iPhone 14) trucking management pr
 | Command | Purpose |
 |---------|---------|
 | `bun install` | Install dependencies (uses Bun, not npm) |
-| `bun run dev` | Dev server on port 3000 |
+| `bun run dev` | Dev server on port 4317 (`--strictPort`) |
 | `bun run build` | Production build |
+| `bun run preview` | Preview server on port 4318 (`--strictPort`) |
 | `bun run test` | Run all Vitest tests |
 | `npx vitest run src/path/to/file.test.ts` | Run a single test file |
 | `bun run lint` | ESLint check |
@@ -46,3 +47,8 @@ FreightOS (bd-tms) — a mobile-first (390px / iPhone 14) trucking management pr
 ## Responsive Design
 
 Mobile-first at 390px. Use Tailwind responsive prefixes (`md:`, `lg:`) and `@md` container queries for tablet/desktop breakpoints. Theme uses OKLch color space with CSS custom properties defined in `src/styles.css`.
+
+## Skill Usage
+
+- Use `browser-agent` skill to validate completed UI work in a browser before considering tasks done.
+- Use `vercel-react-best-practices` skill when writing, reviewing, or refactoring React components.
