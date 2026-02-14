@@ -7,7 +7,7 @@ export function FabActions() {
   const { dispatch } = useAppStore()
 
   return (
-    <div className="fixed bottom-20 right-4 z-40 md:bottom-28 md:right-8">
+    <div className="fixed bottom-24 right-4 z-40 md:bottom-28 md:right-8">
       {open ? (
         <div className="mb-2 space-y-2">
           <button

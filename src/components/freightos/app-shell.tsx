@@ -10,7 +10,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { state, dispatch } = useAppStore()
 
   return (
-    <div className="min-h-screen bg-app pb-24 text-slate-100">
+    <div className="min-h-screen bg-app pb-32 text-slate-100 md:pb-24">
       <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <div>
@@ -36,7 +36,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-4 py-4">{children}</main>
+      <main className="mx-auto w-full max-w-6xl px-4 py-4 pb-6 md:pb-4">{children}</main>
 
       <SearchOverlay />
       <NotificationCenter />

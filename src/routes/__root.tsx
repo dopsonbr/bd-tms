@@ -31,6 +31,8 @@ function RootLayout() {
 }
 
 function RootDocument({ children }: { children: ReactNode }) {
+  const showDevtools = import.meta.env.DEV && import.meta.env.VITE_SHOW_DEVTOOLS === 'true'
+
   return (
     <html lang="en">
       <head>
@@ -38,15 +40,17 @@ function RootDocument({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
-        <TanStackDevtools
-          config={{ position: 'bottom-right' }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
+        {showDevtools ? (
+          <TanStackDevtools
+            config={{ position: 'bottom-right' }}
+            plugins={[
+              {
+                name: 'Tanstack Router',
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+            ]}
+          />
+        ) : null}
         <Scripts />
       </body>
     </html>
