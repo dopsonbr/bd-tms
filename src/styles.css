@@ -1,1 +1,33 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+:root {
+  --app-bg: #05070d;
+  --app-bg-soft: #0a1324;
+  --app-panel: #0d1a32;
+  --app-accent: #22d3ee;
+  --app-highlight: #38bdf8;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(1000px 600px at 90% -10%, rgba(56, 189, 248, 0.2), transparent 60%),
+    radial-gradient(900px 600px at -20% 120%, rgba(20, 184, 166, 0.14), transparent 55%),
+    linear-gradient(180deg, #060a13 0%, #05070d 55%, #070f1f 100%);
+  color: #e2e8f0;
+}
+
+.bg-app {
+  background:
+    radial-gradient(700px 420px at 15% 0%, rgba(34, 211, 238, 0.08), transparent 65%),
+    radial-gradient(800px 420px at 100% 100%, rgba(56, 189, 248, 0.08), transparent 70%),
+    linear-gradient(180deg, rgba(5, 7, 13, 0.96), rgba(5, 7, 13, 1));
+}
+
+* {
+  box-sizing: border-box;
+}

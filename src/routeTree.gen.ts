@@ -9,38 +9,190 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MoreRouteImport } from './routes/more'
+import { Route as LoadsRouteImport } from './routes/loads'
+import { Route as FleetRouteImport } from './routes/fleet'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AiAgentRouteImport } from './routes/ai-agent'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MoreDemoControlsRouteImport } from './routes/more.demo-controls'
+import { Route as LoadsLoadIdRouteImport } from './routes/loads.$loadId'
+import { Route as FleetTruckIdRouteImport } from './routes/fleet.$truckId'
+import { Route as AiAgentVoiceRouteImport } from './routes/ai-agent.voice'
 
+const MoreRoute = MoreRouteImport.update({
+  id: '/more',
+  path: '/more',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoadsRoute = LoadsRouteImport.update({
+  id: '/loads',
+  path: '/loads',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FleetRoute = FleetRouteImport.update({
+  id: '/fleet',
+  path: '/fleet',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiAgentRoute = AiAgentRouteImport.update({
+  id: '/ai-agent',
+  path: '/ai-agent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MoreDemoControlsRoute = MoreDemoControlsRouteImport.update({
+  id: '/demo-controls',
+  path: '/demo-controls',
+  getParentRoute: () => MoreRoute,
+} as any)
+const LoadsLoadIdRoute = LoadsLoadIdRouteImport.update({
+  id: '/$loadId',
+  path: '/$loadId',
+  getParentRoute: () => LoadsRoute,
+} as any)
+const FleetTruckIdRoute = FleetTruckIdRouteImport.update({
+  id: '/$truckId',
+  path: '/$truckId',
+  getParentRoute: () => FleetRoute,
+} as any)
+const AiAgentVoiceRoute = AiAgentVoiceRouteImport.update({
+  id: '/voice',
+  path: '/voice',
+  getParentRoute: () => AiAgentRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-agent': typeof AiAgentRouteWithChildren
+  '/dashboard': typeof DashboardRoute
+  '/fleet': typeof FleetRouteWithChildren
+  '/loads': typeof LoadsRouteWithChildren
+  '/more': typeof MoreRouteWithChildren
+  '/ai-agent/voice': typeof AiAgentVoiceRoute
+  '/fleet/$truckId': typeof FleetTruckIdRoute
+  '/loads/$loadId': typeof LoadsLoadIdRoute
+  '/more/demo-controls': typeof MoreDemoControlsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-agent': typeof AiAgentRouteWithChildren
+  '/dashboard': typeof DashboardRoute
+  '/fleet': typeof FleetRouteWithChildren
+  '/loads': typeof LoadsRouteWithChildren
+  '/more': typeof MoreRouteWithChildren
+  '/ai-agent/voice': typeof AiAgentVoiceRoute
+  '/fleet/$truckId': typeof FleetTruckIdRoute
+  '/loads/$loadId': typeof LoadsLoadIdRoute
+  '/more/demo-controls': typeof MoreDemoControlsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-agent': typeof AiAgentRouteWithChildren
+  '/dashboard': typeof DashboardRoute
+  '/fleet': typeof FleetRouteWithChildren
+  '/loads': typeof LoadsRouteWithChildren
+  '/more': typeof MoreRouteWithChildren
+  '/ai-agent/voice': typeof AiAgentVoiceRoute
+  '/fleet/$truckId': typeof FleetTruckIdRoute
+  '/loads/$loadId': typeof LoadsLoadIdRoute
+  '/more/demo-controls': typeof MoreDemoControlsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/ai-agent'
+    | '/dashboard'
+    | '/fleet'
+    | '/loads'
+    | '/more'
+    | '/ai-agent/voice'
+    | '/fleet/$truckId'
+    | '/loads/$loadId'
+    | '/more/demo-controls'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/ai-agent'
+    | '/dashboard'
+    | '/fleet'
+    | '/loads'
+    | '/more'
+    | '/ai-agent/voice'
+    | '/fleet/$truckId'
+    | '/loads/$loadId'
+    | '/more/demo-controls'
+  id:
+    | '__root__'
+    | '/'
+    | '/ai-agent'
+    | '/dashboard'
+    | '/fleet'
+    | '/loads'
+    | '/more'
+    | '/ai-agent/voice'
+    | '/fleet/$truckId'
+    | '/loads/$loadId'
+    | '/more/demo-controls'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiAgentRoute: typeof AiAgentRouteWithChildren
+  DashboardRoute: typeof DashboardRoute
+  FleetRoute: typeof FleetRouteWithChildren
+  LoadsRoute: typeof LoadsRouteWithChildren
+  MoreRoute: typeof MoreRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/more': {
+      id: '/more'
+      path: '/more'
+      fullPath: '/more'
+      preLoaderRoute: typeof MoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/loads': {
+      id: '/loads'
+      path: '/loads'
+      fullPath: '/loads'
+      preLoaderRoute: typeof LoadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fleet': {
+      id: '/fleet'
+      path: '/fleet'
+      fullPath: '/fleet'
+      preLoaderRoute: typeof FleetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-agent': {
+      id: '/ai-agent'
+      path: '/ai-agent'
+      fullPath: '/ai-agent'
+      preLoaderRoute: typeof AiAgentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +200,85 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/more/demo-controls': {
+      id: '/more/demo-controls'
+      path: '/demo-controls'
+      fullPath: '/more/demo-controls'
+      preLoaderRoute: typeof MoreDemoControlsRouteImport
+      parentRoute: typeof MoreRoute
+    }
+    '/loads/$loadId': {
+      id: '/loads/$loadId'
+      path: '/$loadId'
+      fullPath: '/loads/$loadId'
+      preLoaderRoute: typeof LoadsLoadIdRouteImport
+      parentRoute: typeof LoadsRoute
+    }
+    '/fleet/$truckId': {
+      id: '/fleet/$truckId'
+      path: '/$truckId'
+      fullPath: '/fleet/$truckId'
+      preLoaderRoute: typeof FleetTruckIdRouteImport
+      parentRoute: typeof FleetRoute
+    }
+    '/ai-agent/voice': {
+      id: '/ai-agent/voice'
+      path: '/voice'
+      fullPath: '/ai-agent/voice'
+      preLoaderRoute: typeof AiAgentVoiceRouteImport
+      parentRoute: typeof AiAgentRoute
+    }
   }
 }
 
+interface AiAgentRouteChildren {
+  AiAgentVoiceRoute: typeof AiAgentVoiceRoute
+}
+
+const AiAgentRouteChildren: AiAgentRouteChildren = {
+  AiAgentVoiceRoute: AiAgentVoiceRoute,
+}
+
+const AiAgentRouteWithChildren =
+  AiAgentRoute._addFileChildren(AiAgentRouteChildren)
+
+interface FleetRouteChildren {
+  FleetTruckIdRoute: typeof FleetTruckIdRoute
+}
+
+const FleetRouteChildren: FleetRouteChildren = {
+  FleetTruckIdRoute: FleetTruckIdRoute,
+}
+
+const FleetRouteWithChildren = FleetRoute._addFileChildren(FleetRouteChildren)
+
+interface LoadsRouteChildren {
+  LoadsLoadIdRoute: typeof LoadsLoadIdRoute
+}
+
+const LoadsRouteChildren: LoadsRouteChildren = {
+  LoadsLoadIdRoute: LoadsLoadIdRoute,
+}
+
+const LoadsRouteWithChildren = LoadsRoute._addFileChildren(LoadsRouteChildren)
+
+interface MoreRouteChildren {
+  MoreDemoControlsRoute: typeof MoreDemoControlsRoute
+}
+
+const MoreRouteChildren: MoreRouteChildren = {
+  MoreDemoControlsRoute: MoreDemoControlsRoute,
+}
+
+const MoreRouteWithChildren = MoreRoute._addFileChildren(MoreRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiAgentRoute: AiAgentRouteWithChildren,
+  DashboardRoute: DashboardRoute,
+  FleetRoute: FleetRouteWithChildren,
+  LoadsRoute: LoadsRouteWithChildren,
+  MoreRoute: MoreRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
