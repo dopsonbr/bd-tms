@@ -7,6 +7,12 @@ import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
 const config = defineConfig({
+  server: {
+    port: Number(process.env.DEV_PORT) || 44100,
+  },
+  preview: {
+    port: Number(process.env.PREVIEW_PORT) || 44101,
+  },
   plugins: [
     devtools(),
     nitro(),

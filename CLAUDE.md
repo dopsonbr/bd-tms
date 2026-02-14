@@ -11,7 +11,7 @@ FreightOS (bd-tms) — a mobile-first (390px / iPhone 14) trucking management pr
 | Command | Purpose |
 |---------|---------|
 | `bun install` | Install dependencies (uses Bun, not npm) |
-| `bun run dev` | Dev server on port 3000 |
+| `bun run dev` | Dev server on port 44100 (override with `DEV_PORT` env var) |
 | `bun run build` | Production build |
 | `bun run test` | Run all Vitest tests |
 | `npx vitest run src/path/to/file.test.ts` | Run a single test file |
