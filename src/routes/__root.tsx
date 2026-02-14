@@ -4,6 +4,8 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import appCss from '../styles.css?url'
 
+import { AppProvider } from '@/state/app-store'
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -15,7 +17,12 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'FreightOS | AI Dispatch Prototype',
+      },
+      {
+        name: 'description',
+        content:
+          'Mobile-first trucking operations prototype with deterministic AI dispatch and voice scenario demos.',
       },
     ],
     links: [
@@ -31,12 +38,12 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang='en'>
       <head>
         <HeadContent />
       </head>
       <body>
-        {children}
+        <AppProvider>{children}</AppProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',

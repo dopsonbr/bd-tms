@@ -30,3 +30,32 @@ Built-in demo tools let you walk through scenarios like dispatching a new load, 
 ## Target
 
 Mobile-first (390px / iPhone 14), with responsive support for tablet and desktop.
+
+## Visual Validation
+
+Run the app on `localhost:4317` (default dev command) and capture the main route screenshots from a phone-first viewport:
+
+```bash
+bun run dev
+```
+
+In a second terminal, run:
+
+```bash
+bun run visual:routes
+```
+
+If `@playwright/test` is not installed, run:
+
+```bash
+bun add -d @playwright/test
+bunx playwright install chromium
+```
+
+Optional env override:
+
+```bash
+PLAYWRIGHT_BASE_URL=http://127.0.0.1:4317 bun run visual:routes
+```
+
+Images are written to `artifacts/route-screenshots`.

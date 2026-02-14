@@ -1,57 +1,36 @@
-# FreightOS Implementation Overview
+# FreightOS Implementation Overview (Refined)
 
-## Intent
-- Convert product and design specifications into a three-stage, execution-ready build plan for this repository.
-- Keep implementation aligned with current stack: TanStack React Start, React 19, TypeScript strict, Tailwind 4, shadcn/base-nova components.
-- Deliver an entirely client-side proof of concept with deterministic mocks and scenario playback.
+## Why This Revision
+The previous plans contained large-scale duplication (same work repeated across many synthetic passes), which made execution tracking unreliable. This revision keeps the same product scope while making the plan executable, measurable, and demo-first.
 
-## Current Codebase Baseline
-- `src/routes/index.tsx` currently renders `ComponentExample` starter UI.
-- `src/routes/__root.tsx` configures global document shell and style loading.
-- `src/styles.css` defines theme tokens with Tailwind 4 CSS variables.
-- UI primitive wrappers already exist in `src/components/ui/`.
-- Product and design source docs exist inside `files.zip`: `requirements.md`, `design.md`.
+## Delivery Objective
+Ship a client-only, mobile-first FreightOS proof of concept that supports five demo scenarios end-to-end:
+- `A` New load dispatch
+- `B` Brokered load lifecycle
+- `C` Exception management
+- `D` AI planning session
+- `E` Voice agent call demo
 
-## Stage Ordering
-1. Stage 1: Foundation Platform
-2. Stage 2: Core Operations Workflows
-3. Stage 3: AI, Voice, and Demo Finalization
+## Program Constraints
+- Stack: TanStack React Start + React 19 + TypeScript strict + Tailwind 4 + shadcn/base-nova
+- Primary viewport: `390px` (iPhone 14 class)
+- Deterministic seed data and deterministic scenario playback
+- No backend dependency
+- Accessibility and data consistency are release blockers
 
-## Cross-Stage Rules
-- Mobile-first for 390px viewport; preserve responsiveness for tablet and desktop.
-- No backend dependencies in MVP; all data and workflows simulated locally.
-- Deterministic state and seeded fixtures for repeatable demos.
-- Accessibility and visual consistency are non-optional requirements.
-- Each stage includes executable acceptance criteria and tests.
+## Stage Plan
+1. `Stage 1` Foundation Platform
+2. `Stage 2` Core Operations Workflows
+3. `Stage 3` AI, Voice, and Demo Finalization
 
-## Planned Deliverables
-- `codex-plan-part1.md`: Stage 1 implementation plan.
-- `codex-plan-part2.md`: Stage 2 implementation plan.
-- `codex-plan-part3.md`: Stage 3 implementation plan.
-- `codex-milestones.md`: milestone outcomes and stakeholder expectations.
-- `codex-manual-validtation.md`: manual validation playbook for app behavior.
+## Cross-Stage Quality Gates
+- Reproducible seed + scenario resets
+- No impossible state combinations (truck/driver/load integrity)
+- Shared state updates reflected across all surfaces
+- Mobile-first layouts stay readable and actionable
 
-## Data And Mock Principles
-- Seed entities: trucks, drivers, loads, shippers, carriers, lane rates, events.
-- Provide deterministic IDs and timestamps for reproducible walkthroughs.
-- Track status transitions via state machine style transitions.
-- Time simulator drives event queue and scenario progression.
-
-## Public Interface Contract Summary
-- Domain types centralized in `src/domain/types.ts`.
-- App state and actions centralized in `src/state/app-store.ts`.
-- Simulation engine contracts in `src/sim/`.
-- Recommendation and voice simulation contracts in `src/ai/`.
-
-## Scenario Coverage Target
-- Scenario A: New Load Dispatch
-- Scenario B: Brokered Load Lifecycle
-- Scenario C: Exception Management
-- Scenario D: AI Planning Session
-- Scenario E: Voice Agent Demo
-
-## Done Criteria Across Entire Program
-- All scenario flows are runnable from in-app controls.
-- Data remains logically consistent after each action sequence.
-- UI demonstrates information-dense but readable mobile behavior.
-- Manual validation checklist passes without blockers.
+## Definition of Done (Program)
+- All five scenarios are runnable from in-app demo controls
+- Voice and AI demos include visible reasoning and deterministic outputs
+- Dashboard, Loads, Fleet, AI Agent, and More tabs are fully navigable
+- Manual validation checklist has no critical failures
