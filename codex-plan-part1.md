@@ -1,0 +1,1029 @@
+# Codex Plan Part 1: Foundation Platform
+
+## Stage Goal
+- Build the architectural and UI foundation for FreightOS so Stage 2 and Stage 3 can focus on workflows and AI/voice behavior without rework.
+
+## Scope
+- Application shell and navigation skeleton.
+- Domain model and deterministic seed generator.
+- Central store, selectors, and state actions.
+- Route scaffolding for all primary tabs.
+- Core component primitives for domain cards and status patterns.
+- Simulation scaffolding: scenarios, clock, and event queue contracts.
+- Baseline tests for state correctness and routing.
+
+## Out Of Scope
+- Full dispatch workflow behavior.
+- Voice transcript playback details.
+- Complete AI conversation orchestration.
+
+## Existing Constraints
+- Keep `src/routeTree.gen.ts` generated; never edit manually.
+- Preserve existing Tailwind and shadcn styling patterns.
+- Continue using `cn` utility in component composition.
+- Keep strict TypeScript compatibility and lint cleanliness.
+
+## Target File Additions
+- `src/domain/types.ts`
+- `src/domain/constants.ts`
+- `src/domain/guards.ts`
+- `src/data/seed/base-seed.ts`
+- `src/data/seed/build-seed.ts`
+- `src/data/seed/scenarios.ts`
+- `src/state/app-store.ts`
+- `src/state/selectors.ts`
+- `src/state/actions.ts`
+- `src/sim/clock.ts`
+- `src/sim/events.ts`
+- `src/sim/event-dispatcher.ts`
+- `src/components/freightos/status-badge.tsx`
+- `src/components/freightos/metric-card.tsx`
+- `src/components/freightos/entity-card.tsx`
+- `src/components/freightos/timeline-step.tsx`
+- `src/components/freightos/app-shell.tsx`
+- `src/routes/dashboard.tsx`
+- `src/routes/loads.tsx`
+- `src/routes/fleet.tsx`
+- `src/routes/ai-agent.tsx`
+- `src/routes/more.tsx`
+- `src/routes/index.tsx` (redirect or dashboard entry)
+- `src/test/domain/seed.test.ts`
+- `src/test/state/store.test.ts`
+- `src/test/routing/tab-routes.test.tsx`
+
+## Public API and Type Contracts (Must Lock In Stage 1)
+- `Truck` entity with identity, equipment, telemetry, assignment references.
+- `Driver` entity with HOS clocks and profile attributes.
+- `Load` entity with lifecycle state, stops, financials, and assignment details.
+- `ExceptionEvent` entity with severity, source, recommendation links.
+- `VoiceCall` entity baseline for later transcript simulation.
+- `AppState` with normalized entity stores and UI slice.
+- `AppActions` grouped by domain: load, fleet, broker, ai, sim, ui.
+- `ScenarioDefinition` with initial state snapshot and scheduled events.
+
+## Stage 1 Acceptance Criteria
+- App boots into a FreightOS shell, not the starter component playground.
+- Bottom tab navigation exposes Dashboard, Loads, Fleet, AI Agent, More.
+- Seed state includes coherent entities and cross references.
+- Store selectors provide stable derived slices for each tab.
+- Scenario reset and baseline clock functions work deterministically.
+- Unit tests validate seed consistency and action invariants.
+
+## Stage 1 Detailed Work Packages
+- [ ] FND-0001 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 1) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0002 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 1) | Verify: Tab changes do not remount root shell
+- [ ] FND-0003 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 1) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0004 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 1) | Verify: Colors match design token intent
+- [ ] FND-0005 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 1) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0006 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 1) | Verify: All cards align to spacing grid
+- [ ] FND-0007 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 1) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0008 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 1) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0009 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 1) | Verify: Seed count targets are met and coherent
+- [ ] FND-0010 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 1) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0011 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 1) | Verify: Clock increments without drift
+- [ ] FND-0012 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 1) | Verify: Events fire exactly once
+- [ ] FND-0013 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 1) | Verify: State updates are immutable and traceable
+- [ ] FND-0014 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 1) | Verify: Selectors return stable references where expected
+- [ ] FND-0015 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 1) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0016 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 1) | Verify: Status badge variants match business statuses
+- [ ] FND-0017 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 1) | Verify: Metric cards display trend and context
+- [ ] FND-0018 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 1) | Verify: Entity cards render across tabs
+- [ ] FND-0019 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 1) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0020 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 1) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0021 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 1) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0022 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 1) | Verify: Search overlay opens from all tabs
+- [ ] FND-0023 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 1) | Verify: Notification center tracks read states
+- [ ] FND-0024 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 1) | Verify: FAB shows configured actions
+- [ ] FND-0025 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 1) | Verify: Inconsistent states are blocked
+- [ ] FND-0026 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 1) | Verify: Core controls are screen reader reachable
+- [ ] FND-0027 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 1) | Verify: Error states are deterministic and reusable
+- [ ] FND-0028 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 1) | Verify: Tests run with minimal setup friction
+- [ ] FND-0029 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 1) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0030 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 1) | Verify: CI scripts pass locally
+- [ ] FND-0031 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 2) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0032 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 2) | Verify: Tab changes do not remount root shell
+- [ ] FND-0033 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 2) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0034 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 2) | Verify: Colors match design token intent
+- [ ] FND-0035 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 2) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0036 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 2) | Verify: All cards align to spacing grid
+- [ ] FND-0037 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 2) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0038 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 2) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0039 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 2) | Verify: Seed count targets are met and coherent
+- [ ] FND-0040 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 2) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0041 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 2) | Verify: Clock increments without drift
+- [ ] FND-0042 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 2) | Verify: Events fire exactly once
+- [ ] FND-0043 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 2) | Verify: State updates are immutable and traceable
+- [ ] FND-0044 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 2) | Verify: Selectors return stable references where expected
+- [ ] FND-0045 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 2) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0046 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 2) | Verify: Status badge variants match business statuses
+- [ ] FND-0047 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 2) | Verify: Metric cards display trend and context
+- [ ] FND-0048 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 2) | Verify: Entity cards render across tabs
+- [ ] FND-0049 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 2) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0050 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 2) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0051 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 2) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0052 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 2) | Verify: Search overlay opens from all tabs
+- [ ] FND-0053 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 2) | Verify: Notification center tracks read states
+- [ ] FND-0054 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 2) | Verify: FAB shows configured actions
+- [ ] FND-0055 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 2) | Verify: Inconsistent states are blocked
+- [ ] FND-0056 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 2) | Verify: Core controls are screen reader reachable
+- [ ] FND-0057 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 2) | Verify: Error states are deterministic and reusable
+- [ ] FND-0058 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 2) | Verify: Tests run with minimal setup friction
+- [ ] FND-0059 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 2) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0060 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 2) | Verify: CI scripts pass locally
+- [ ] FND-0061 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 3) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0062 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 3) | Verify: Tab changes do not remount root shell
+- [ ] FND-0063 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 3) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0064 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 3) | Verify: Colors match design token intent
+- [ ] FND-0065 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 3) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0066 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 3) | Verify: All cards align to spacing grid
+- [ ] FND-0067 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 3) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0068 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 3) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0069 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 3) | Verify: Seed count targets are met and coherent
+- [ ] FND-0070 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 3) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0071 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 3) | Verify: Clock increments without drift
+- [ ] FND-0072 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 3) | Verify: Events fire exactly once
+- [ ] FND-0073 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 3) | Verify: State updates are immutable and traceable
+- [ ] FND-0074 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 3) | Verify: Selectors return stable references where expected
+- [ ] FND-0075 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 3) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0076 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 3) | Verify: Status badge variants match business statuses
+- [ ] FND-0077 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 3) | Verify: Metric cards display trend and context
+- [ ] FND-0078 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 3) | Verify: Entity cards render across tabs
+- [ ] FND-0079 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 3) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0080 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 3) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0081 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 3) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0082 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 3) | Verify: Search overlay opens from all tabs
+- [ ] FND-0083 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 3) | Verify: Notification center tracks read states
+- [ ] FND-0084 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 3) | Verify: FAB shows configured actions
+- [ ] FND-0085 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 3) | Verify: Inconsistent states are blocked
+- [ ] FND-0086 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 3) | Verify: Core controls are screen reader reachable
+- [ ] FND-0087 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 3) | Verify: Error states are deterministic and reusable
+- [ ] FND-0088 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 3) | Verify: Tests run with minimal setup friction
+- [ ] FND-0089 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 3) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0090 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 3) | Verify: CI scripts pass locally
+- [ ] FND-0091 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 4) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0092 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 4) | Verify: Tab changes do not remount root shell
+- [ ] FND-0093 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 4) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0094 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 4) | Verify: Colors match design token intent
+- [ ] FND-0095 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 4) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0096 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 4) | Verify: All cards align to spacing grid
+- [ ] FND-0097 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 4) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0098 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 4) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0099 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 4) | Verify: Seed count targets are met and coherent
+- [ ] FND-0100 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 4) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0101 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 4) | Verify: Clock increments without drift
+- [ ] FND-0102 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 4) | Verify: Events fire exactly once
+- [ ] FND-0103 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 4) | Verify: State updates are immutable and traceable
+- [ ] FND-0104 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 4) | Verify: Selectors return stable references where expected
+- [ ] FND-0105 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 4) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0106 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 4) | Verify: Status badge variants match business statuses
+- [ ] FND-0107 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 4) | Verify: Metric cards display trend and context
+- [ ] FND-0108 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 4) | Verify: Entity cards render across tabs
+- [ ] FND-0109 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 4) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0110 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 4) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0111 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 4) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0112 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 4) | Verify: Search overlay opens from all tabs
+- [ ] FND-0113 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 4) | Verify: Notification center tracks read states
+- [ ] FND-0114 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 4) | Verify: FAB shows configured actions
+- [ ] FND-0115 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 4) | Verify: Inconsistent states are blocked
+- [ ] FND-0116 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 4) | Verify: Core controls are screen reader reachable
+- [ ] FND-0117 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 4) | Verify: Error states are deterministic and reusable
+- [ ] FND-0118 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 4) | Verify: Tests run with minimal setup friction
+- [ ] FND-0119 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 4) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0120 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 4) | Verify: CI scripts pass locally
+- [ ] FND-0121 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 5) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0122 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 5) | Verify: Tab changes do not remount root shell
+- [ ] FND-0123 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 5) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0124 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 5) | Verify: Colors match design token intent
+- [ ] FND-0125 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 5) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0126 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 5) | Verify: All cards align to spacing grid
+- [ ] FND-0127 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 5) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0128 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 5) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0129 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 5) | Verify: Seed count targets are met and coherent
+- [ ] FND-0130 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 5) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0131 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 5) | Verify: Clock increments without drift
+- [ ] FND-0132 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 5) | Verify: Events fire exactly once
+- [ ] FND-0133 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 5) | Verify: State updates are immutable and traceable
+- [ ] FND-0134 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 5) | Verify: Selectors return stable references where expected
+- [ ] FND-0135 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 5) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0136 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 5) | Verify: Status badge variants match business statuses
+- [ ] FND-0137 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 5) | Verify: Metric cards display trend and context
+- [ ] FND-0138 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 5) | Verify: Entity cards render across tabs
+- [ ] FND-0139 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 5) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0140 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 5) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0141 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 5) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0142 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 5) | Verify: Search overlay opens from all tabs
+- [ ] FND-0143 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 5) | Verify: Notification center tracks read states
+- [ ] FND-0144 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 5) | Verify: FAB shows configured actions
+- [ ] FND-0145 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 5) | Verify: Inconsistent states are blocked
+- [ ] FND-0146 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 5) | Verify: Core controls are screen reader reachable
+- [ ] FND-0147 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 5) | Verify: Error states are deterministic and reusable
+- [ ] FND-0148 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 5) | Verify: Tests run with minimal setup friction
+- [ ] FND-0149 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 5) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0150 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 5) | Verify: CI scripts pass locally
+- [ ] FND-0151 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 6) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0152 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 6) | Verify: Tab changes do not remount root shell
+- [ ] FND-0153 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 6) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0154 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 6) | Verify: Colors match design token intent
+- [ ] FND-0155 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 6) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0156 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 6) | Verify: All cards align to spacing grid
+- [ ] FND-0157 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 6) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0158 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 6) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0159 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 6) | Verify: Seed count targets are met and coherent
+- [ ] FND-0160 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 6) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0161 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 6) | Verify: Clock increments without drift
+- [ ] FND-0162 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 6) | Verify: Events fire exactly once
+- [ ] FND-0163 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 6) | Verify: State updates are immutable and traceable
+- [ ] FND-0164 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 6) | Verify: Selectors return stable references where expected
+- [ ] FND-0165 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 6) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0166 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 6) | Verify: Status badge variants match business statuses
+- [ ] FND-0167 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 6) | Verify: Metric cards display trend and context
+- [ ] FND-0168 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 6) | Verify: Entity cards render across tabs
+- [ ] FND-0169 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 6) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0170 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 6) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0171 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 6) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0172 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 6) | Verify: Search overlay opens from all tabs
+- [ ] FND-0173 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 6) | Verify: Notification center tracks read states
+- [ ] FND-0174 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 6) | Verify: FAB shows configured actions
+- [ ] FND-0175 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 6) | Verify: Inconsistent states are blocked
+- [ ] FND-0176 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 6) | Verify: Core controls are screen reader reachable
+- [ ] FND-0177 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 6) | Verify: Error states are deterministic and reusable
+- [ ] FND-0178 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 6) | Verify: Tests run with minimal setup friction
+- [ ] FND-0179 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 6) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0180 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 6) | Verify: CI scripts pass locally
+- [ ] FND-0181 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 7) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0182 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 7) | Verify: Tab changes do not remount root shell
+- [ ] FND-0183 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 7) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0184 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 7) | Verify: Colors match design token intent
+- [ ] FND-0185 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 7) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0186 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 7) | Verify: All cards align to spacing grid
+- [ ] FND-0187 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 7) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0188 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 7) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0189 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 7) | Verify: Seed count targets are met and coherent
+- [ ] FND-0190 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 7) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0191 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 7) | Verify: Clock increments without drift
+- [ ] FND-0192 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 7) | Verify: Events fire exactly once
+- [ ] FND-0193 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 7) | Verify: State updates are immutable and traceable
+- [ ] FND-0194 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 7) | Verify: Selectors return stable references where expected
+- [ ] FND-0195 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 7) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0196 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 7) | Verify: Status badge variants match business statuses
+- [ ] FND-0197 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 7) | Verify: Metric cards display trend and context
+- [ ] FND-0198 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 7) | Verify: Entity cards render across tabs
+- [ ] FND-0199 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 7) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0200 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 7) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0201 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 7) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0202 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 7) | Verify: Search overlay opens from all tabs
+- [ ] FND-0203 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 7) | Verify: Notification center tracks read states
+- [ ] FND-0204 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 7) | Verify: FAB shows configured actions
+- [ ] FND-0205 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 7) | Verify: Inconsistent states are blocked
+- [ ] FND-0206 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 7) | Verify: Core controls are screen reader reachable
+- [ ] FND-0207 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 7) | Verify: Error states are deterministic and reusable
+- [ ] FND-0208 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 7) | Verify: Tests run with minimal setup friction
+- [ ] FND-0209 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 7) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0210 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 7) | Verify: CI scripts pass locally
+- [ ] FND-0211 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 8) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0212 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 8) | Verify: Tab changes do not remount root shell
+- [ ] FND-0213 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 8) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0214 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 8) | Verify: Colors match design token intent
+- [ ] FND-0215 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 8) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0216 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 8) | Verify: All cards align to spacing grid
+- [ ] FND-0217 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 8) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0218 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 8) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0219 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 8) | Verify: Seed count targets are met and coherent
+- [ ] FND-0220 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 8) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0221 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 8) | Verify: Clock increments without drift
+- [ ] FND-0222 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 8) | Verify: Events fire exactly once
+- [ ] FND-0223 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 8) | Verify: State updates are immutable and traceable
+- [ ] FND-0224 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 8) | Verify: Selectors return stable references where expected
+- [ ] FND-0225 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 8) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0226 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 8) | Verify: Status badge variants match business statuses
+- [ ] FND-0227 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 8) | Verify: Metric cards display trend and context
+- [ ] FND-0228 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 8) | Verify: Entity cards render across tabs
+- [ ] FND-0229 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 8) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0230 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 8) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0231 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 8) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0232 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 8) | Verify: Search overlay opens from all tabs
+- [ ] FND-0233 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 8) | Verify: Notification center tracks read states
+- [ ] FND-0234 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 8) | Verify: FAB shows configured actions
+- [ ] FND-0235 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 8) | Verify: Inconsistent states are blocked
+- [ ] FND-0236 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 8) | Verify: Core controls are screen reader reachable
+- [ ] FND-0237 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 8) | Verify: Error states are deterministic and reusable
+- [ ] FND-0238 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 8) | Verify: Tests run with minimal setup friction
+- [ ] FND-0239 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 8) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0240 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 8) | Verify: CI scripts pass locally
+- [ ] FND-0241 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 9) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0242 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 9) | Verify: Tab changes do not remount root shell
+- [ ] FND-0243 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 9) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0244 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 9) | Verify: Colors match design token intent
+- [ ] FND-0245 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 9) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0246 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 9) | Verify: All cards align to spacing grid
+- [ ] FND-0247 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 9) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0248 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 9) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0249 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 9) | Verify: Seed count targets are met and coherent
+- [ ] FND-0250 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 9) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0251 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 9) | Verify: Clock increments without drift
+- [ ] FND-0252 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 9) | Verify: Events fire exactly once
+- [ ] FND-0253 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 9) | Verify: State updates are immutable and traceable
+- [ ] FND-0254 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 9) | Verify: Selectors return stable references where expected
+- [ ] FND-0255 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 9) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0256 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 9) | Verify: Status badge variants match business statuses
+- [ ] FND-0257 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 9) | Verify: Metric cards display trend and context
+- [ ] FND-0258 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 9) | Verify: Entity cards render across tabs
+- [ ] FND-0259 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 9) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0260 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 9) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0261 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 9) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0262 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 9) | Verify: Search overlay opens from all tabs
+- [ ] FND-0263 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 9) | Verify: Notification center tracks read states
+- [ ] FND-0264 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 9) | Verify: FAB shows configured actions
+- [ ] FND-0265 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 9) | Verify: Inconsistent states are blocked
+- [ ] FND-0266 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 9) | Verify: Core controls are screen reader reachable
+- [ ] FND-0267 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 9) | Verify: Error states are deterministic and reusable
+- [ ] FND-0268 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 9) | Verify: Tests run with minimal setup friction
+- [ ] FND-0269 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 9) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0270 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 9) | Verify: CI scripts pass locally
+- [ ] FND-0271 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 10) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0272 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 10) | Verify: Tab changes do not remount root shell
+- [ ] FND-0273 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 10) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0274 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 10) | Verify: Colors match design token intent
+- [ ] FND-0275 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 10) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0276 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 10) | Verify: All cards align to spacing grid
+- [ ] FND-0277 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 10) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0278 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 10) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0279 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 10) | Verify: Seed count targets are met and coherent
+- [ ] FND-0280 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 10) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0281 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 10) | Verify: Clock increments without drift
+- [ ] FND-0282 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 10) | Verify: Events fire exactly once
+- [ ] FND-0283 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 10) | Verify: State updates are immutable and traceable
+- [ ] FND-0284 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 10) | Verify: Selectors return stable references where expected
+- [ ] FND-0285 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 10) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0286 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 10) | Verify: Status badge variants match business statuses
+- [ ] FND-0287 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 10) | Verify: Metric cards display trend and context
+- [ ] FND-0288 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 10) | Verify: Entity cards render across tabs
+- [ ] FND-0289 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 10) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0290 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 10) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0291 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 10) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0292 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 10) | Verify: Search overlay opens from all tabs
+- [ ] FND-0293 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 10) | Verify: Notification center tracks read states
+- [ ] FND-0294 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 10) | Verify: FAB shows configured actions
+- [ ] FND-0295 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 10) | Verify: Inconsistent states are blocked
+- [ ] FND-0296 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 10) | Verify: Core controls are screen reader reachable
+- [ ] FND-0297 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 10) | Verify: Error states are deterministic and reusable
+- [ ] FND-0298 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 10) | Verify: Tests run with minimal setup friction
+- [ ] FND-0299 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 10) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0300 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 10) | Verify: CI scripts pass locally
+- [ ] FND-0301 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 11) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0302 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 11) | Verify: Tab changes do not remount root shell
+- [ ] FND-0303 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 11) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0304 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 11) | Verify: Colors match design token intent
+- [ ] FND-0305 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 11) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0306 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 11) | Verify: All cards align to spacing grid
+- [ ] FND-0307 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 11) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0308 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 11) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0309 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 11) | Verify: Seed count targets are met and coherent
+- [ ] FND-0310 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 11) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0311 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 11) | Verify: Clock increments without drift
+- [ ] FND-0312 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 11) | Verify: Events fire exactly once
+- [ ] FND-0313 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 11) | Verify: State updates are immutable and traceable
+- [ ] FND-0314 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 11) | Verify: Selectors return stable references where expected
+- [ ] FND-0315 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 11) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0316 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 11) | Verify: Status badge variants match business statuses
+- [ ] FND-0317 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 11) | Verify: Metric cards display trend and context
+- [ ] FND-0318 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 11) | Verify: Entity cards render across tabs
+- [ ] FND-0319 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 11) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0320 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 11) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0321 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 11) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0322 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 11) | Verify: Search overlay opens from all tabs
+- [ ] FND-0323 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 11) | Verify: Notification center tracks read states
+- [ ] FND-0324 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 11) | Verify: FAB shows configured actions
+- [ ] FND-0325 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 11) | Verify: Inconsistent states are blocked
+- [ ] FND-0326 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 11) | Verify: Core controls are screen reader reachable
+- [ ] FND-0327 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 11) | Verify: Error states are deterministic and reusable
+- [ ] FND-0328 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 11) | Verify: Tests run with minimal setup friction
+- [ ] FND-0329 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 11) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0330 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 11) | Verify: CI scripts pass locally
+- [ ] FND-0331 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 12) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0332 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 12) | Verify: Tab changes do not remount root shell
+- [ ] FND-0333 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 12) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0334 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 12) | Verify: Colors match design token intent
+- [ ] FND-0335 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 12) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0336 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 12) | Verify: All cards align to spacing grid
+- [ ] FND-0337 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 12) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0338 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 12) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0339 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 12) | Verify: Seed count targets are met and coherent
+- [ ] FND-0340 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 12) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0341 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 12) | Verify: Clock increments without drift
+- [ ] FND-0342 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 12) | Verify: Events fire exactly once
+- [ ] FND-0343 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 12) | Verify: State updates are immutable and traceable
+- [ ] FND-0344 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 12) | Verify: Selectors return stable references where expected
+- [ ] FND-0345 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 12) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0346 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 12) | Verify: Status badge variants match business statuses
+- [ ] FND-0347 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 12) | Verify: Metric cards display trend and context
+- [ ] FND-0348 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 12) | Verify: Entity cards render across tabs
+- [ ] FND-0349 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 12) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0350 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 12) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0351 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 12) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0352 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 12) | Verify: Search overlay opens from all tabs
+- [ ] FND-0353 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 12) | Verify: Notification center tracks read states
+- [ ] FND-0354 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 12) | Verify: FAB shows configured actions
+- [ ] FND-0355 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 12) | Verify: Inconsistent states are blocked
+- [ ] FND-0356 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 12) | Verify: Core controls are screen reader reachable
+- [ ] FND-0357 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 12) | Verify: Error states are deterministic and reusable
+- [ ] FND-0358 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 12) | Verify: Tests run with minimal setup friction
+- [ ] FND-0359 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 12) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0360 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 12) | Verify: CI scripts pass locally
+- [ ] FND-0361 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 13) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0362 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 13) | Verify: Tab changes do not remount root shell
+- [ ] FND-0363 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 13) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0364 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 13) | Verify: Colors match design token intent
+- [ ] FND-0365 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 13) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0366 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 13) | Verify: All cards align to spacing grid
+- [ ] FND-0367 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 13) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0368 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 13) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0369 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 13) | Verify: Seed count targets are met and coherent
+- [ ] FND-0370 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 13) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0371 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 13) | Verify: Clock increments without drift
+- [ ] FND-0372 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 13) | Verify: Events fire exactly once
+- [ ] FND-0373 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 13) | Verify: State updates are immutable and traceable
+- [ ] FND-0374 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 13) | Verify: Selectors return stable references where expected
+- [ ] FND-0375 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 13) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0376 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 13) | Verify: Status badge variants match business statuses
+- [ ] FND-0377 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 13) | Verify: Metric cards display trend and context
+- [ ] FND-0378 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 13) | Verify: Entity cards render across tabs
+- [ ] FND-0379 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 13) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0380 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 13) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0381 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 13) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0382 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 13) | Verify: Search overlay opens from all tabs
+- [ ] FND-0383 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 13) | Verify: Notification center tracks read states
+- [ ] FND-0384 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 13) | Verify: FAB shows configured actions
+- [ ] FND-0385 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 13) | Verify: Inconsistent states are blocked
+- [ ] FND-0386 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 13) | Verify: Core controls are screen reader reachable
+- [ ] FND-0387 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 13) | Verify: Error states are deterministic and reusable
+- [ ] FND-0388 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 13) | Verify: Tests run with minimal setup friction
+- [ ] FND-0389 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 13) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0390 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 13) | Verify: CI scripts pass locally
+- [ ] FND-0391 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 14) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0392 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 14) | Verify: Tab changes do not remount root shell
+- [ ] FND-0393 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 14) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0394 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 14) | Verify: Colors match design token intent
+- [ ] FND-0395 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 14) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0396 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 14) | Verify: All cards align to spacing grid
+- [ ] FND-0397 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 14) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0398 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 14) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0399 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 14) | Verify: Seed count targets are met and coherent
+- [ ] FND-0400 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 14) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0401 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 14) | Verify: Clock increments without drift
+- [ ] FND-0402 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 14) | Verify: Events fire exactly once
+- [ ] FND-0403 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 14) | Verify: State updates are immutable and traceable
+- [ ] FND-0404 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 14) | Verify: Selectors return stable references where expected
+- [ ] FND-0405 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 14) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0406 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 14) | Verify: Status badge variants match business statuses
+- [ ] FND-0407 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 14) | Verify: Metric cards display trend and context
+- [ ] FND-0408 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 14) | Verify: Entity cards render across tabs
+- [ ] FND-0409 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 14) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0410 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 14) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0411 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 14) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0412 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 14) | Verify: Search overlay opens from all tabs
+- [ ] FND-0413 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 14) | Verify: Notification center tracks read states
+- [ ] FND-0414 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 14) | Verify: FAB shows configured actions
+- [ ] FND-0415 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 14) | Verify: Inconsistent states are blocked
+- [ ] FND-0416 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 14) | Verify: Core controls are screen reader reachable
+- [ ] FND-0417 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 14) | Verify: Error states are deterministic and reusable
+- [ ] FND-0418 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 14) | Verify: Tests run with minimal setup friction
+- [ ] FND-0419 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 14) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0420 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 14) | Verify: CI scripts pass locally
+- [ ] FND-0421 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 15) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0422 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 15) | Verify: Tab changes do not remount root shell
+- [ ] FND-0423 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 15) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0424 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 15) | Verify: Colors match design token intent
+- [ ] FND-0425 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 15) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0426 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 15) | Verify: All cards align to spacing grid
+- [ ] FND-0427 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 15) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0428 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 15) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0429 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 15) | Verify: Seed count targets are met and coherent
+- [ ] FND-0430 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 15) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0431 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 15) | Verify: Clock increments without drift
+- [ ] FND-0432 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 15) | Verify: Events fire exactly once
+- [ ] FND-0433 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 15) | Verify: State updates are immutable and traceable
+- [ ] FND-0434 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 15) | Verify: Selectors return stable references where expected
+- [ ] FND-0435 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 15) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0436 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 15) | Verify: Status badge variants match business statuses
+- [ ] FND-0437 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 15) | Verify: Metric cards display trend and context
+- [ ] FND-0438 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 15) | Verify: Entity cards render across tabs
+- [ ] FND-0439 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 15) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0440 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 15) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0441 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 15) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0442 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 15) | Verify: Search overlay opens from all tabs
+- [ ] FND-0443 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 15) | Verify: Notification center tracks read states
+- [ ] FND-0444 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 15) | Verify: FAB shows configured actions
+- [ ] FND-0445 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 15) | Verify: Inconsistent states are blocked
+- [ ] FND-0446 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 15) | Verify: Core controls are screen reader reachable
+- [ ] FND-0447 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 15) | Verify: Error states are deterministic and reusable
+- [ ] FND-0448 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 15) | Verify: Tests run with minimal setup friction
+- [ ] FND-0449 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 15) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0450 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 15) | Verify: CI scripts pass locally
+- [ ] FND-0451 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 16) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0452 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 16) | Verify: Tab changes do not remount root shell
+- [ ] FND-0453 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 16) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0454 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 16) | Verify: Colors match design token intent
+- [ ] FND-0455 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 16) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0456 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 16) | Verify: All cards align to spacing grid
+- [ ] FND-0457 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 16) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0458 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 16) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0459 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 16) | Verify: Seed count targets are met and coherent
+- [ ] FND-0460 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 16) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0461 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 16) | Verify: Clock increments without drift
+- [ ] FND-0462 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 16) | Verify: Events fire exactly once
+- [ ] FND-0463 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 16) | Verify: State updates are immutable and traceable
+- [ ] FND-0464 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 16) | Verify: Selectors return stable references where expected
+- [ ] FND-0465 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 16) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0466 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 16) | Verify: Status badge variants match business statuses
+- [ ] FND-0467 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 16) | Verify: Metric cards display trend and context
+- [ ] FND-0468 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 16) | Verify: Entity cards render across tabs
+- [ ] FND-0469 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 16) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0470 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 16) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0471 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 16) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0472 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 16) | Verify: Search overlay opens from all tabs
+- [ ] FND-0473 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 16) | Verify: Notification center tracks read states
+- [ ] FND-0474 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 16) | Verify: FAB shows configured actions
+- [ ] FND-0475 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 16) | Verify: Inconsistent states are blocked
+- [ ] FND-0476 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 16) | Verify: Core controls are screen reader reachable
+- [ ] FND-0477 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 16) | Verify: Error states are deterministic and reusable
+- [ ] FND-0478 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 16) | Verify: Tests run with minimal setup friction
+- [ ] FND-0479 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 16) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0480 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 16) | Verify: CI scripts pass locally
+- [ ] FND-0481 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 17) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0482 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 17) | Verify: Tab changes do not remount root shell
+- [ ] FND-0483 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 17) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0484 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 17) | Verify: Colors match design token intent
+- [ ] FND-0485 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 17) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0486 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 17) | Verify: All cards align to spacing grid
+- [ ] FND-0487 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 17) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0488 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 17) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0489 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 17) | Verify: Seed count targets are met and coherent
+- [ ] FND-0490 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 17) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0491 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 17) | Verify: Clock increments without drift
+- [ ] FND-0492 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 17) | Verify: Events fire exactly once
+- [ ] FND-0493 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 17) | Verify: State updates are immutable and traceable
+- [ ] FND-0494 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 17) | Verify: Selectors return stable references where expected
+- [ ] FND-0495 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 17) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0496 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 17) | Verify: Status badge variants match business statuses
+- [ ] FND-0497 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 17) | Verify: Metric cards display trend and context
+- [ ] FND-0498 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 17) | Verify: Entity cards render across tabs
+- [ ] FND-0499 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 17) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0500 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 17) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0501 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 17) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0502 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 17) | Verify: Search overlay opens from all tabs
+- [ ] FND-0503 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 17) | Verify: Notification center tracks read states
+- [ ] FND-0504 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 17) | Verify: FAB shows configured actions
+- [ ] FND-0505 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 17) | Verify: Inconsistent states are blocked
+- [ ] FND-0506 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 17) | Verify: Core controls are screen reader reachable
+- [ ] FND-0507 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 17) | Verify: Error states are deterministic and reusable
+- [ ] FND-0508 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 17) | Verify: Tests run with minimal setup friction
+- [ ] FND-0509 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 17) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0510 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 17) | Verify: CI scripts pass locally
+- [ ] FND-0511 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 18) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0512 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 18) | Verify: Tab changes do not remount root shell
+- [ ] FND-0513 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 18) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0514 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 18) | Verify: Colors match design token intent
+- [ ] FND-0515 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 18) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0516 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 18) | Verify: All cards align to spacing grid
+- [ ] FND-0517 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 18) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0518 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 18) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0519 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 18) | Verify: Seed count targets are met and coherent
+- [ ] FND-0520 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 18) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0521 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 18) | Verify: Clock increments without drift
+- [ ] FND-0522 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 18) | Verify: Events fire exactly once
+- [ ] FND-0523 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 18) | Verify: State updates are immutable and traceable
+- [ ] FND-0524 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 18) | Verify: Selectors return stable references where expected
+- [ ] FND-0525 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 18) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0526 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 18) | Verify: Status badge variants match business statuses
+- [ ] FND-0527 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 18) | Verify: Metric cards display trend and context
+- [ ] FND-0528 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 18) | Verify: Entity cards render across tabs
+- [ ] FND-0529 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 18) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0530 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 18) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0531 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 18) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0532 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 18) | Verify: Search overlay opens from all tabs
+- [ ] FND-0533 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 18) | Verify: Notification center tracks read states
+- [ ] FND-0534 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 18) | Verify: FAB shows configured actions
+- [ ] FND-0535 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 18) | Verify: Inconsistent states are blocked
+- [ ] FND-0536 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 18) | Verify: Core controls are screen reader reachable
+- [ ] FND-0537 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 18) | Verify: Error states are deterministic and reusable
+- [ ] FND-0538 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 18) | Verify: Tests run with minimal setup friction
+- [ ] FND-0539 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 18) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0540 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 18) | Verify: CI scripts pass locally
+- [ ] FND-0541 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 19) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0542 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 19) | Verify: Tab changes do not remount root shell
+- [ ] FND-0543 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 19) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0544 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 19) | Verify: Colors match design token intent
+- [ ] FND-0545 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 19) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0546 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 19) | Verify: All cards align to spacing grid
+- [ ] FND-0547 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 19) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0548 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 19) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0549 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 19) | Verify: Seed count targets are met and coherent
+- [ ] FND-0550 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 19) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0551 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 19) | Verify: Clock increments without drift
+- [ ] FND-0552 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 19) | Verify: Events fire exactly once
+- [ ] FND-0553 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 19) | Verify: State updates are immutable and traceable
+- [ ] FND-0554 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 19) | Verify: Selectors return stable references where expected
+- [ ] FND-0555 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 19) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0556 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 19) | Verify: Status badge variants match business statuses
+- [ ] FND-0557 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 19) | Verify: Metric cards display trend and context
+- [ ] FND-0558 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 19) | Verify: Entity cards render across tabs
+- [ ] FND-0559 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 19) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0560 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 19) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0561 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 19) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0562 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 19) | Verify: Search overlay opens from all tabs
+- [ ] FND-0563 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 19) | Verify: Notification center tracks read states
+- [ ] FND-0564 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 19) | Verify: FAB shows configured actions
+- [ ] FND-0565 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 19) | Verify: Inconsistent states are blocked
+- [ ] FND-0566 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 19) | Verify: Core controls are screen reader reachable
+- [ ] FND-0567 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 19) | Verify: Error states are deterministic and reusable
+- [ ] FND-0568 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 19) | Verify: Tests run with minimal setup friction
+- [ ] FND-0569 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 19) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0570 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 19) | Verify: CI scripts pass locally
+- [ ] FND-0571 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 20) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0572 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 20) | Verify: Tab changes do not remount root shell
+- [ ] FND-0573 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 20) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0574 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 20) | Verify: Colors match design token intent
+- [ ] FND-0575 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 20) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0576 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 20) | Verify: All cards align to spacing grid
+- [ ] FND-0577 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 20) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0578 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 20) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0579 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 20) | Verify: Seed count targets are met and coherent
+- [ ] FND-0580 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 20) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0581 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 20) | Verify: Clock increments without drift
+- [ ] FND-0582 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 20) | Verify: Events fire exactly once
+- [ ] FND-0583 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 20) | Verify: State updates are immutable and traceable
+- [ ] FND-0584 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 20) | Verify: Selectors return stable references where expected
+- [ ] FND-0585 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 20) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0586 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 20) | Verify: Status badge variants match business statuses
+- [ ] FND-0587 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 20) | Verify: Metric cards display trend and context
+- [ ] FND-0588 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 20) | Verify: Entity cards render across tabs
+- [ ] FND-0589 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 20) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0590 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 20) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0591 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 20) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0592 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 20) | Verify: Search overlay opens from all tabs
+- [ ] FND-0593 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 20) | Verify: Notification center tracks read states
+- [ ] FND-0594 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 20) | Verify: FAB shows configured actions
+- [ ] FND-0595 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 20) | Verify: Inconsistent states are blocked
+- [ ] FND-0596 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 20) | Verify: Core controls are screen reader reachable
+- [ ] FND-0597 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 20) | Verify: Error states are deterministic and reusable
+- [ ] FND-0598 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 20) | Verify: Tests run with minimal setup friction
+- [ ] FND-0599 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 20) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0600 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 20) | Verify: CI scripts pass locally
+- [ ] FND-0601 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 21) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0602 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 21) | Verify: Tab changes do not remount root shell
+- [ ] FND-0603 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 21) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0604 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 21) | Verify: Colors match design token intent
+- [ ] FND-0605 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 21) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0606 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 21) | Verify: All cards align to spacing grid
+- [ ] FND-0607 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 21) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0608 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 21) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0609 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 21) | Verify: Seed count targets are met and coherent
+- [ ] FND-0610 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 21) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0611 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 21) | Verify: Clock increments without drift
+- [ ] FND-0612 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 21) | Verify: Events fire exactly once
+- [ ] FND-0613 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 21) | Verify: State updates are immutable and traceable
+- [ ] FND-0614 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 21) | Verify: Selectors return stable references where expected
+- [ ] FND-0615 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 21) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0616 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 21) | Verify: Status badge variants match business statuses
+- [ ] FND-0617 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 21) | Verify: Metric cards display trend and context
+- [ ] FND-0618 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 21) | Verify: Entity cards render across tabs
+- [ ] FND-0619 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 21) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0620 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 21) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0621 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 21) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0622 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 21) | Verify: Search overlay opens from all tabs
+- [ ] FND-0623 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 21) | Verify: Notification center tracks read states
+- [ ] FND-0624 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 21) | Verify: FAB shows configured actions
+- [ ] FND-0625 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 21) | Verify: Inconsistent states are blocked
+- [ ] FND-0626 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 21) | Verify: Core controls are screen reader reachable
+- [ ] FND-0627 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 21) | Verify: Error states are deterministic and reusable
+- [ ] FND-0628 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 21) | Verify: Tests run with minimal setup friction
+- [ ] FND-0629 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 21) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0630 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 21) | Verify: CI scripts pass locally
+- [ ] FND-0631 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 22) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0632 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 22) | Verify: Tab changes do not remount root shell
+- [ ] FND-0633 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 22) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0634 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 22) | Verify: Colors match design token intent
+- [ ] FND-0635 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 22) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0636 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 22) | Verify: All cards align to spacing grid
+- [ ] FND-0637 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 22) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0638 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 22) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0639 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 22) | Verify: Seed count targets are met and coherent
+- [ ] FND-0640 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 22) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0641 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 22) | Verify: Clock increments without drift
+- [ ] FND-0642 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 22) | Verify: Events fire exactly once
+- [ ] FND-0643 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 22) | Verify: State updates are immutable and traceable
+- [ ] FND-0644 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 22) | Verify: Selectors return stable references where expected
+- [ ] FND-0645 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 22) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0646 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 22) | Verify: Status badge variants match business statuses
+- [ ] FND-0647 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 22) | Verify: Metric cards display trend and context
+- [ ] FND-0648 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 22) | Verify: Entity cards render across tabs
+- [ ] FND-0649 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 22) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0650 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 22) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0651 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 22) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0652 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 22) | Verify: Search overlay opens from all tabs
+- [ ] FND-0653 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 22) | Verify: Notification center tracks read states
+- [ ] FND-0654 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 22) | Verify: FAB shows configured actions
+- [ ] FND-0655 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 22) | Verify: Inconsistent states are blocked
+- [ ] FND-0656 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 22) | Verify: Core controls are screen reader reachable
+- [ ] FND-0657 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 22) | Verify: Error states are deterministic and reusable
+- [ ] FND-0658 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 22) | Verify: Tests run with minimal setup friction
+- [ ] FND-0659 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 22) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0660 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 22) | Verify: CI scripts pass locally
+- [ ] FND-0661 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 23) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0662 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 23) | Verify: Tab changes do not remount root shell
+- [ ] FND-0663 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 23) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0664 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 23) | Verify: Colors match design token intent
+- [ ] FND-0665 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 23) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0666 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 23) | Verify: All cards align to spacing grid
+- [ ] FND-0667 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 23) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0668 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 23) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0669 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 23) | Verify: Seed count targets are met and coherent
+- [ ] FND-0670 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 23) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0671 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 23) | Verify: Clock increments without drift
+- [ ] FND-0672 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 23) | Verify: Events fire exactly once
+- [ ] FND-0673 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 23) | Verify: State updates are immutable and traceable
+- [ ] FND-0674 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 23) | Verify: Selectors return stable references where expected
+- [ ] FND-0675 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 23) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0676 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 23) | Verify: Status badge variants match business statuses
+- [ ] FND-0677 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 23) | Verify: Metric cards display trend and context
+- [ ] FND-0678 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 23) | Verify: Entity cards render across tabs
+- [ ] FND-0679 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 23) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0680 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 23) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0681 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 23) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0682 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 23) | Verify: Search overlay opens from all tabs
+- [ ] FND-0683 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 23) | Verify: Notification center tracks read states
+- [ ] FND-0684 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 23) | Verify: FAB shows configured actions
+- [ ] FND-0685 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 23) | Verify: Inconsistent states are blocked
+- [ ] FND-0686 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 23) | Verify: Core controls are screen reader reachable
+- [ ] FND-0687 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 23) | Verify: Error states are deterministic and reusable
+- [ ] FND-0688 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 23) | Verify: Tests run with minimal setup friction
+- [ ] FND-0689 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 23) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0690 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 23) | Verify: CI scripts pass locally
+- [ ] FND-0691 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 24) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0692 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 24) | Verify: Tab changes do not remount root shell
+- [ ] FND-0693 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 24) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0694 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 24) | Verify: Colors match design token intent
+- [ ] FND-0695 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 24) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0696 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 24) | Verify: All cards align to spacing grid
+- [ ] FND-0697 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 24) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0698 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 24) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0699 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 24) | Verify: Seed count targets are met and coherent
+- [ ] FND-0700 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 24) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0701 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 24) | Verify: Clock increments without drift
+- [ ] FND-0702 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 24) | Verify: Events fire exactly once
+- [ ] FND-0703 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 24) | Verify: State updates are immutable and traceable
+- [ ] FND-0704 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 24) | Verify: Selectors return stable references where expected
+- [ ] FND-0705 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 24) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0706 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 24) | Verify: Status badge variants match business statuses
+- [ ] FND-0707 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 24) | Verify: Metric cards display trend and context
+- [ ] FND-0708 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 24) | Verify: Entity cards render across tabs
+- [ ] FND-0709 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 24) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0710 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 24) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0711 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 24) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0712 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 24) | Verify: Search overlay opens from all tabs
+- [ ] FND-0713 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 24) | Verify: Notification center tracks read states
+- [ ] FND-0714 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 24) | Verify: FAB shows configured actions
+- [ ] FND-0715 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 24) | Verify: Inconsistent states are blocked
+- [ ] FND-0716 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 24) | Verify: Core controls are screen reader reachable
+- [ ] FND-0717 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 24) | Verify: Error states are deterministic and reusable
+- [ ] FND-0718 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 24) | Verify: Tests run with minimal setup friction
+- [ ] FND-0719 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 24) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0720 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 24) | Verify: CI scripts pass locally
+- [ ] FND-0721 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 25) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0722 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 25) | Verify: Tab changes do not remount root shell
+- [ ] FND-0723 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 25) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0724 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 25) | Verify: Colors match design token intent
+- [ ] FND-0725 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 25) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0726 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 25) | Verify: All cards align to spacing grid
+- [ ] FND-0727 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 25) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0728 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 25) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0729 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 25) | Verify: Seed count targets are met and coherent
+- [ ] FND-0730 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 25) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0731 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 25) | Verify: Clock increments without drift
+- [ ] FND-0732 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 25) | Verify: Events fire exactly once
+- [ ] FND-0733 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 25) | Verify: State updates are immutable and traceable
+- [ ] FND-0734 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 25) | Verify: Selectors return stable references where expected
+- [ ] FND-0735 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 25) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0736 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 25) | Verify: Status badge variants match business statuses
+- [ ] FND-0737 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 25) | Verify: Metric cards display trend and context
+- [ ] FND-0738 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 25) | Verify: Entity cards render across tabs
+- [ ] FND-0739 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 25) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0740 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 25) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0741 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 25) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0742 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 25) | Verify: Search overlay opens from all tabs
+- [ ] FND-0743 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 25) | Verify: Notification center tracks read states
+- [ ] FND-0744 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 25) | Verify: FAB shows configured actions
+- [ ] FND-0745 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 25) | Verify: Inconsistent states are blocked
+- [ ] FND-0746 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 25) | Verify: Core controls are screen reader reachable
+- [ ] FND-0747 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 25) | Verify: Error states are deterministic and reusable
+- [ ] FND-0748 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 25) | Verify: Tests run with minimal setup friction
+- [ ] FND-0749 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 25) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0750 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 25) | Verify: CI scripts pass locally
+- [ ] FND-0751 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 26) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0752 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 26) | Verify: Tab changes do not remount root shell
+- [ ] FND-0753 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 26) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0754 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 26) | Verify: Colors match design token intent
+- [ ] FND-0755 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 26) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0756 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 26) | Verify: All cards align to spacing grid
+- [ ] FND-0757 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 26) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0758 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 26) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0759 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 26) | Verify: Seed count targets are met and coherent
+- [ ] FND-0760 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 26) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0761 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 26) | Verify: Clock increments without drift
+- [ ] FND-0762 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 26) | Verify: Events fire exactly once
+- [ ] FND-0763 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 26) | Verify: State updates are immutable and traceable
+- [ ] FND-0764 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 26) | Verify: Selectors return stable references where expected
+- [ ] FND-0765 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 26) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0766 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 26) | Verify: Status badge variants match business statuses
+- [ ] FND-0767 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 26) | Verify: Metric cards display trend and context
+- [ ] FND-0768 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 26) | Verify: Entity cards render across tabs
+- [ ] FND-0769 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 26) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0770 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 26) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0771 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 26) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0772 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 26) | Verify: Search overlay opens from all tabs
+- [ ] FND-0773 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 26) | Verify: Notification center tracks read states
+- [ ] FND-0774 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 26) | Verify: FAB shows configured actions
+- [ ] FND-0775 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 26) | Verify: Inconsistent states are blocked
+- [ ] FND-0776 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 26) | Verify: Core controls are screen reader reachable
+- [ ] FND-0777 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 26) | Verify: Error states are deterministic and reusable
+- [ ] FND-0778 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 26) | Verify: Tests run with minimal setup friction
+- [ ] FND-0779 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 26) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0780 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 26) | Verify: CI scripts pass locally
+- [ ] FND-0781 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 27) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0782 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 27) | Verify: Tab changes do not remount root shell
+- [ ] FND-0783 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 27) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0784 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 27) | Verify: Colors match design token intent
+- [ ] FND-0785 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 27) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0786 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 27) | Verify: All cards align to spacing grid
+- [ ] FND-0787 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 27) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0788 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 27) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0789 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 27) | Verify: Seed count targets are met and coherent
+- [ ] FND-0790 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 27) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0791 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 27) | Verify: Clock increments without drift
+- [ ] FND-0792 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 27) | Verify: Events fire exactly once
+- [ ] FND-0793 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 27) | Verify: State updates are immutable and traceable
+- [ ] FND-0794 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 27) | Verify: Selectors return stable references where expected
+- [ ] FND-0795 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 27) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0796 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 27) | Verify: Status badge variants match business statuses
+- [ ] FND-0797 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 27) | Verify: Metric cards display trend and context
+- [ ] FND-0798 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 27) | Verify: Entity cards render across tabs
+- [ ] FND-0799 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 27) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0800 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 27) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0801 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 27) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0802 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 27) | Verify: Search overlay opens from all tabs
+- [ ] FND-0803 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 27) | Verify: Notification center tracks read states
+- [ ] FND-0804 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 27) | Verify: FAB shows configured actions
+- [ ] FND-0805 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 27) | Verify: Inconsistent states are blocked
+- [ ] FND-0806 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 27) | Verify: Core controls are screen reader reachable
+- [ ] FND-0807 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 27) | Verify: Error states are deterministic and reusable
+- [ ] FND-0808 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 27) | Verify: Tests run with minimal setup friction
+- [ ] FND-0809 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 27) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0810 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 27) | Verify: CI scripts pass locally
+- [ ] FND-0811 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 28) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0812 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 28) | Verify: Tab changes do not remount root shell
+- [ ] FND-0813 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 28) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0814 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 28) | Verify: Colors match design token intent
+- [ ] FND-0815 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 28) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0816 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 28) | Verify: All cards align to spacing grid
+- [ ] FND-0817 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 28) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0818 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 28) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0819 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 28) | Verify: Seed count targets are met and coherent
+- [ ] FND-0820 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 28) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0821 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 28) | Verify: Clock increments without drift
+- [ ] FND-0822 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 28) | Verify: Events fire exactly once
+- [ ] FND-0823 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 28) | Verify: State updates are immutable and traceable
+- [ ] FND-0824 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 28) | Verify: Selectors return stable references where expected
+- [ ] FND-0825 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 28) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0826 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 28) | Verify: Status badge variants match business statuses
+- [ ] FND-0827 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 28) | Verify: Metric cards display trend and context
+- [ ] FND-0828 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 28) | Verify: Entity cards render across tabs
+- [ ] FND-0829 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 28) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0830 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 28) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0831 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 28) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0832 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 28) | Verify: Search overlay opens from all tabs
+- [ ] FND-0833 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 28) | Verify: Notification center tracks read states
+- [ ] FND-0834 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 28) | Verify: FAB shows configured actions
+- [ ] FND-0835 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 28) | Verify: Inconsistent states are blocked
+- [ ] FND-0836 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 28) | Verify: Core controls are screen reader reachable
+- [ ] FND-0837 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 28) | Verify: Error states are deterministic and reusable
+- [ ] FND-0838 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 28) | Verify: Tests run with minimal setup friction
+- [ ] FND-0839 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 28) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0840 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 28) | Verify: CI scripts pass locally
+- [ ] FND-0841 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 29) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0842 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 29) | Verify: Tab changes do not remount root shell
+- [ ] FND-0843 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 29) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0844 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 29) | Verify: Colors match design token intent
+- [ ] FND-0845 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 29) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0846 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 29) | Verify: All cards align to spacing grid
+- [ ] FND-0847 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 29) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0848 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 29) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0849 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 29) | Verify: Seed count targets are met and coherent
+- [ ] FND-0850 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 29) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0851 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 29) | Verify: Clock increments without drift
+- [ ] FND-0852 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 29) | Verify: Events fire exactly once
+- [ ] FND-0853 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 29) | Verify: State updates are immutable and traceable
+- [ ] FND-0854 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 29) | Verify: Selectors return stable references where expected
+- [ ] FND-0855 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 29) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0856 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 29) | Verify: Status badge variants match business statuses
+- [ ] FND-0857 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 29) | Verify: Metric cards display trend and context
+- [ ] FND-0858 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 29) | Verify: Entity cards render across tabs
+- [ ] FND-0859 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 29) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0860 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 29) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0861 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 29) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0862 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 29) | Verify: Search overlay opens from all tabs
+- [ ] FND-0863 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 29) | Verify: Notification center tracks read states
+- [ ] FND-0864 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 29) | Verify: FAB shows configured actions
+- [ ] FND-0865 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 29) | Verify: Inconsistent states are blocked
+- [ ] FND-0866 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 29) | Verify: Core controls are screen reader reachable
+- [ ] FND-0867 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 29) | Verify: Error states are deterministic and reusable
+- [ ] FND-0868 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 29) | Verify: Tests run with minimal setup friction
+- [ ] FND-0869 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 29) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0870 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 29) | Verify: CI scripts pass locally
+- [ ] FND-0871 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 30) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0872 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 30) | Verify: Tab changes do not remount root shell
+- [ ] FND-0873 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 30) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0874 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 30) | Verify: Colors match design token intent
+- [ ] FND-0875 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 30) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0876 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 30) | Verify: All cards align to spacing grid
+- [ ] FND-0877 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 30) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0878 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 30) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0879 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 30) | Verify: Seed count targets are met and coherent
+- [ ] FND-0880 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 30) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0881 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 30) | Verify: Clock increments without drift
+- [ ] FND-0882 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 30) | Verify: Events fire exactly once
+- [ ] FND-0883 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 30) | Verify: State updates are immutable and traceable
+- [ ] FND-0884 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 30) | Verify: Selectors return stable references where expected
+- [ ] FND-0885 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 30) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0886 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 30) | Verify: Status badge variants match business statuses
+- [ ] FND-0887 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 30) | Verify: Metric cards display trend and context
+- [ ] FND-0888 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 30) | Verify: Entity cards render across tabs
+- [ ] FND-0889 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 30) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0890 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 30) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0891 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 30) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0892 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 30) | Verify: Search overlay opens from all tabs
+- [ ] FND-0893 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 30) | Verify: Notification center tracks read states
+- [ ] FND-0894 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 30) | Verify: FAB shows configured actions
+- [ ] FND-0895 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 30) | Verify: Inconsistent states are blocked
+- [ ] FND-0896 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 30) | Verify: Core controls are screen reader reachable
+- [ ] FND-0897 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 30) | Verify: Error states are deterministic and reusable
+- [ ] FND-0898 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 30) | Verify: Tests run with minimal setup friction
+- [ ] FND-0899 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 30) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0900 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 30) | Verify: CI scripts pass locally
+- [ ] FND-0901 | Architecture | App Shell | File: `src/components/freightos/app-shell.tsx` | Action: Define responsibilities and render boundaries (pass 31) | Verify: Shell loads and tab nav appears on 390px viewport
+- [ ] FND-0902 | Navigation | Tab Navigation | File: `src/components/freightos/tab-bar.tsx` | Action: Implement mobile-first interactions and selected tab state (pass 31) | Verify: Tab changes do not remount root shell
+- [ ] FND-0903 | Routing | Route Skeleton | File: `src/routes/__root.tsx` | Action: Add route registration and fallback behavior (pass 31) | Verify: Direct route URL load resolves correctly
+- [ ] FND-0904 | Theme | Theme Tokens | File: `src/styles.css` | Action: Map design tokens to FreightOS palette (pass 31) | Verify: Colors match design token intent
+- [ ] FND-0905 | Typography | Typography | File: `src/styles.css` | Action: Lock heading/body scale and readability thresholds (pass 31) | Verify: Text remains legible at minimum size rules
+- [ ] FND-0906 | Layout | Spacing System | File: `src/styles.css` | Action: Enforce spacing tokens for cards and overlays (pass 31) | Verify: All cards align to spacing grid
+- [ ] FND-0907 | Domain | Domain Types | File: `src/domain/types.ts` | Action: Declare strict entity interfaces with comments (pass 31) | Verify: TypeScript catches missing entity fields
+- [ ] FND-0908 | Domain | Domain Guards | File: `src/domain/guards.ts` | Action: Add guard functions for valid transitions (pass 31) | Verify: Invalid lifecycle updates are rejected
+- [ ] FND-0909 | Data | Seed Builder | File: `src/data/seed/build-seed.ts` | Action: Generate deterministic entities and cross references (pass 31) | Verify: Seed count targets are met and coherent
+- [ ] FND-0910 | Data | Scenario Catalog | File: `src/data/seed/scenarios.ts` | Action: Compose scenario snapshots with metadata (pass 31) | Verify: Scenario IDs are stable and documented
+- [ ] FND-0911 | Simulation | Clock Engine | File: `src/sim/clock.ts` | Action: Implement deterministic advancing clock (pass 31) | Verify: Clock increments without drift
+- [ ] FND-0912 | Simulation | Event Queue | File: `src/sim/events.ts` | Action: Register and dispatch queued events (pass 31) | Verify: Events fire exactly once
+- [ ] FND-0913 | State | State Store | File: `src/state/app-store.ts` | Action: Initialize normalized state with slices (pass 31) | Verify: State updates are immutable and traceable
+- [ ] FND-0914 | State | Derived Selectors | File: `src/state/selectors.ts` | Action: Add memoized selectors for each screen (pass 31) | Verify: Selectors return stable references where expected
+- [ ] FND-0915 | State | Action Contracts | File: `src/state/actions.ts` | Action: Define action payload contracts (pass 31) | Verify: Actions are serializable for debug snapshots
+- [ ] FND-0916 | Components | Status Badge | File: `src/components/freightos/status-badge.tsx` | Action: Implement status variants with text+icon patterns (pass 31) | Verify: Status badge variants match business statuses
+- [ ] FND-0917 | Components | Metric Card | File: `src/components/freightos/metric-card.tsx` | Action: Build metric card variants with trend semantics (pass 31) | Verify: Metric cards display trend and context
+- [ ] FND-0918 | Components | Entity Card | File: `src/components/freightos/entity-card.tsx` | Action: Create load/truck/driver card shell (pass 31) | Verify: Entity cards render across tabs
+- [ ] FND-0919 | Components | Timeline Step | File: `src/components/freightos/timeline-step.tsx` | Action: Render lifecycle nodes for timeline sections (pass 31) | Verify: Timeline nodes reflect stage progression
+- [ ] FND-0920 | Components | Bottom Sheet | File: `src/components/freightos/bottom-sheet.tsx` | Action: Create reusable sheet primitive for mobile (pass 31) | Verify: Sheet opens and closes with expected focus
+- [ ] FND-0921 | Map | Map Adapter | File: `src/components/freightos/map-adapter.tsx` | Action: Implement map shim and visible-entity sync (pass 31) | Verify: Map list and viewport selection stay in sync
+- [ ] FND-0922 | Global UI | Search Overlay | File: `src/components/freightos/search-overlay.tsx` | Action: Add global search overlay scaffolding (pass 31) | Verify: Search overlay opens from all tabs
+- [ ] FND-0923 | Global UI | Notification Center | File: `src/components/freightos/notification-center.tsx` | Action: Add unread/read notification drawer (pass 31) | Verify: Notification center tracks read states
+- [ ] FND-0924 | Global UI | FAB Actions | File: `src/components/freightos/fab-actions.tsx` | Action: Implement quick action speed dial shell (pass 31) | Verify: FAB shows configured actions
+- [ ] FND-0925 | Integrity | Data Consistency | File: `src/domain/guards.ts` | Action: Validate referential integrity per state update (pass 31) | Verify: Inconsistent states are blocked
+- [ ] FND-0926 | Accessibility | Accessibility Labels | File: `src/components/freightos/a11y.ts` | Action: Add ARIA labels and keyboard focus behavior (pass 31) | Verify: Core controls are screen reader reachable
+- [ ] FND-0927 | Resilience | Error Surfaces | File: `src/components/freightos/error-state.tsx` | Action: Add consistent empty/loading/error UI states (pass 31) | Verify: Error states are deterministic and reusable
+- [ ] FND-0928 | Testing | Testing Harness | File: `src/test/setup.ts` | Action: Prepare shared test utilities and wrappers (pass 31) | Verify: Tests run with minimal setup friction
+- [ ] FND-0929 | Testing | Fixtures | File: `src/test/fixtures/base-fixtures.ts` | Action: Create deterministic fixture bundles (pass 31) | Verify: Fixtures support repeatable integration tests
+- [ ] FND-0930 | Quality | Build Checks | File: `package.json` | Action: Add scripts and checks for test execution (pass 31) | Verify: CI scripts pass locally
+
+## Stage 1 Test Cases And Scenarios
+- [ ] T1-001 Validate seed counts: 45 trucks, 30 drivers, 80 loads, 15 shippers, 25 carriers.
+- [ ] T1-002 Validate no truck is assigned to more than one active load.
+- [ ] T1-003 Validate no driver exceeds HOS limits in initial state.
+- [ ] T1-004 Validate load lifecycle starts at allowed stages only.
+- [ ] T1-005 Validate scenario loader swaps complete state atomically.
+- [ ] T1-006 Validate reset returns canonical baseline snapshot.
+- [ ] T1-007 Validate bottom tab shell on iPhone 14 viewport dimensions.
+- [ ] T1-008 Validate route deep links render expected shell sections.
+- [ ] T1-009 Validate search overlay keyboard trap behavior.
+- [ ] T1-010 Validate notification read/unread state transitions.
+
+## Stage 1 Assumptions And Defaults
+- All API integrations are local simulation only.
+- Map implementation starts with static canvas and synchronized list data.
+- Voice and AI entities are staged but not fully rendered in this phase.
+- Scenario metadata includes descriptive labels and expected outcomes.
+
+## Stage 1 Exit Checklist
+- [ ] App shell replaces starter `ComponentExample` entry.
+- [ ] All planned foundation routes compile and render.
+- [ ] Domain types and guards are implemented and tested.
+- [ ] Seed and scenario engines are deterministic.
+- [ ] Store and selectors are stable and documented.
+- [ ] Foundation tests pass in Vitest.
+- [ ] Stage 2 can begin without architecture-level blockers.
